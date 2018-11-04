@@ -5,7 +5,7 @@ PrintWriter numOutput;
 
 /* Declarations */
 
-int expLength = 4;
+int expLength = 8;
 
 enum Rule {
   B_35, ASHBY
@@ -50,6 +50,99 @@ class Trial {
   }
 }
 
+class ConfidenceBar {
+  float y;
+  
+  float bar_x;
+  float bar_width;
+  float bar_height;
+  
+  float circle_x;
+  float circle_r;
+  
+  float confidence;
+  
+  boolean move;
+  
+  ConfidenceBar(){
+    y = height/2;
+    
+    bar_x = width/2;
+    circle_x = width/2;
+    
+    bar_width = width*0.6;
+    bar_height = 20;
+    
+    circle_r = 20;
+    
+    move = false;
+    
+    confidence = 0;
+  }
+  
+  void update(){
+    if(mousePressed){
+      if(mouseX - circle_x < circle_r && mouseY - y < circle_r){
+        move = true;
+      }
+    } else{
+      move = false;
+    }
+    
+    if(move){
+      moveCircle(mouseX - pmouseX);
+    }
+  }
+  
+  void render(){
+    background(150);
+    
+    strokeWeight(2);
+    
+    stroke(0);
+    fill(100, 100, 255);
+    rect(bar_x - bar_width/2, y - bar_height/2, bar_width, bar_height);
+    
+    stroke(0, 0, 100);
+    fill(0, 0, 200);
+    ellipse(circle_x, y, circle_r*2, circle_r*2);
+    
+    //textMode(CENTER);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    fill(0);
+    text("Marcá en la barra cuán seguro\nestás de tus últimas decisiones", width/2, 100);
+    text("Apretá enter cuando estés\nconforme con tu respuesta", width/2, height - 100);
+    
+    textSize(16);
+    text("Nada\nseguro", bar_x - bar_width/2 - 40, y);
+    text("Totalmente\nseguro", bar_x + bar_width/2 + 50, y);
+  }
+  
+  void moveCircle(float amount){
+    circle_x = circle_x + amount;
+    if(circle_x > bar_x + bar_width/2){
+      circle_x = bar_x + bar_width/2;
+      move = false;
+    } else if(circle_x < bar_x - bar_width/2){
+      circle_x = bar_x - bar_width/2;
+      move = false;
+    }
+  }
+  
+  float getConfidence(){
+    return confidence;
+    
+  }
+  
+  void setConfidence(){
+    float offset = bar_x - bar_width/2;
+    confidence = (circle_x - offset)/bar_width;
+  }
+}
+
+
+
 class Experiment {
   final Rule rule;
   final Complexity complexity;
@@ -58,6 +151,8 @@ class Experiment {
   int currentTrialIndex;
   boolean startedTrials;
   int points;
+  final ConfidenceBar[] confidenceBars;
+  int currentBar;
 
   Experiment(Rule rule, Complexity complexity, boolean isTimeBounded, Trial[] trials) {
     this.rule = rule;
@@ -67,27 +162,57 @@ class Experiment {
     this.currentTrialIndex = 0;
     this.startedTrials = false;
     this.points = 0;
+    this.confidenceBars = generateBars();
+    currentBar = 0;
   }
+  
+  ConfidenceBar[] generateBars(){
+    ConfidenceBar[] confidenceBars = new ConfidenceBar[4];
+    
+    for (int i = 0; i < 4; i++) {
+      confidenceBars[i] = new ConfidenceBar();
+    }
 
+    return confidenceBars;
+  }
+  
+  ConfidenceBar getCurrentBar() {
+    return confidenceBars[currentBar];
+  }
+  
   void advanceToNextTrial(boolean correct) {
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
     
     points += correct ? 1 : 0;
+    
+    if (finishedAllTrials()) {
+      throw new IllegalStateException("Already finised trials for experiment " + toString());
+    }
+    println("Trial " + currentExperiment().currentTrialIndex + " % " + expLength/4 +" = " + currentExperiment().currentTrialIndex % (expLength/4));
     currentTrialIndex++;
   }
 
   Trial getCurrentTrial() {
     if (finishedAllTrials()) {
-      throw new IllegalStateException("Already finised trials for experiment " + toString());
+      printStackTrace(new IllegalStateException("Already finised trials for experiment " + toString()));
     }
     
     if (!startedTrials) {
-      throw new IllegalStateException("Haven't started trials for experiment " + toString());
+      printStackTrace(new IllegalStateException("Haven't started trials for experiment " + toString()));
     }
     
     return trials[currentTrialIndex];
+  }
+  
+  String data() {
+    int bar = 0;
+    if(currentBar > 0){
+      bar = currentBar - 1;
+    }
+    
+    return getCurrentTrial().toString() + "\t" + confidenceBars[bar].getConfidence();
   }
 
   boolean finishedAllTrials() {
@@ -130,7 +255,7 @@ class Experiment {
   }
 
   @Override
-    public String toString() {
+  public String toString() {
     return "Experiment(rule=" + rule.toString() + 
       ", complexity=" + complexity.toString() + 
       ", isTimeBounded=" + String.valueOf(isTimeBounded) + 
@@ -258,16 +383,26 @@ void updateExperiment(boolean answeredCorrectly) {
   Experiment currentExperiment = currentExperiment();
   
   try{
-    output.println("\n" + currentExperiment.getCurrentTrial().toString());
-    println("Succesfully written data.");
+    output.println("\n" + currentExperiment.data());
+    //println("Succesfully written data.");
     //output.flush();
   } catch(Exception e){
     println("There was an error while writing to the data file");
   }
   
+  if (currentExperiment.currentTrialIndex % (expLength/4) == 1){
+    showConfidenceBar = true;
+  }
+  
   currentExperiment.advanceToNextTrial(answeredCorrectly);
+  
+  checkIfFinished();
 
-  if (currentExperiment.finishedAllTrials()) {
+}
+
+void checkIfFinished(){
+  if (currentExperiment().finishedAllTrials() && !showConfidenceBar) {
+    println("changing experiment index");
     currentExperimentIndex++;
     println("Moving to Experiment number " + String.valueOf(currentExperimentIndex));
 
@@ -277,11 +412,13 @@ void updateExperiment(boolean answeredCorrectly) {
       try{
         //output.flush();
         output.close();
-        println("Succesfully closed data file.");
+        //println("Succesfully closed data file.");
       }catch(Exception e){
         println("There was an error closing the data file.");
       }
     }
+    
+    
   }
 }
 
@@ -329,10 +466,6 @@ void drawFinishedExperiments() {
   for (Experiment experiment : experiments) totalPoints += experiment.points;
   
   text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + totalPoints + "\nTocá la tecla ENTER para salir.", width/2, height/2);
-
-  if (keyCode == ENTER) {
-    exit();
-  }
 }
 
 /* Logic */
@@ -342,6 +475,7 @@ boolean hasFinishedExperiments = false;
 boolean interScreen = false;
 boolean correct = false;
 int currentGeneralInstructionIndex = 0;
+boolean showConfidenceBar = false;
 int currentExperimentIndex = 0;
 long timer = 0L;
 long millisPerBoundedExperiment = 2000; 
@@ -371,7 +505,7 @@ void setup() {
     String[] lines2 = loadStrings("data.txt");
     println("Succesfully loaded data file.");
     if(lines2.length==0){
-      output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)");
+      output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)\tconf");
       //output.flush();
       println("Succesfully written head data.");
     }
@@ -421,13 +555,22 @@ void draw() {
     drawInterScreen();
   } else if (hasFinishedExperiments) {
     drawFinishedExperiments();
+  } else if (showConfidenceBar) {
+    currentExperiment().getCurrentBar().update();
+    currentExperiment().getCurrentBar().render();
   } else {
     drawExperiment();
   }
 }
 
 void keyReleased() {
-  if (hasFinishedExperiments || interScreen) return;
+  if (interScreen) return;
+
+  if (hasFinishedExperiments) {
+    if (keyCode == ENTER) {
+      exit();
+    }
+  }
 
   if (!hasUserAcceptedTerms) {
     handleGeneralInstructionKeyReleased();
@@ -447,10 +590,22 @@ void handleGeneralInstructionKeyReleased() {
 void handleExperimentKeyReleased() {
   Experiment currentExperiment = currentExperiment();
   
-  if (keyCode == ENTER) {
-    if (!currentExperiment.startedTrials) {
+  if (!currentExperiment.startedTrials) {
+    if (keyCode == ENTER) {
       currentExperiment.startTrials();
     }
+    return;
+  }
+
+  if (showConfidenceBar) {
+    if (keyCode == ENTER) {
+      currentExperiment.getCurrentBar().setConfidence();
+      currentExperiment.currentBar++;
+      showConfidenceBar = false;
+      checkIfFinished();
+      timer = millis();
+    }
+    return;
   }
   
   if (keyCode == LEFT || keyCode == RIGHT) {
@@ -461,10 +616,11 @@ void handleExperimentKeyReleased() {
     currentTrial.classified = true;
     currentTrial.correct = correct;
     currentTrial.time = millis() - timer;
-    println(correct ? "correct!" : "wrong!");
+    //println(correct ? "correct!" : "wrong!");
     
     interScreen = true;
     timer = millis();
     updateExperiment(correct);
+    return;
   }
 }
