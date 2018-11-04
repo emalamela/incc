@@ -6,7 +6,7 @@ int puntos = 0;
 
 /* Declarations */
 
-int expLength = 4;
+int expLength = 8;
 
 enum Rule {
   B_35, ASHBY
@@ -178,10 +178,12 @@ class Experiment {
   }
   
   void advanceToNextTrial() {
+    println("Trial " + currentExperiment().currentTrialIndex + " % " + expLength/4 +" = " + currentExperiment().currentTrialIndex % (expLength/4));
+    
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
-    print("Advancing to next Trial");
+    //println("Advancing to next Trial");
     //println("Current Trial Index: "+currentTrialIndex);
     //println("Number of Trials: "+trials.length);
     currentTrialIndex++;
@@ -321,19 +323,25 @@ void updateExperiment() {
   
   try{
     output.println("\n" + currentExperiment.data());
-    println("Succesfully written data.");
+    //println("Succesfully written data.");
     //output.flush();
   } catch(Exception e){
     println("There was an error while writing to the data file");
   }
   
-  currentExperiment.advanceToNextTrial();
   
-  if((currentExperiment.currentTrialIndex + 1) % expLength/4 == 0){
+  if(currentExperiment.currentTrialIndex % (expLength/4) == 1){
     showConfidenceBar = true;
   }
   
-  if (currentExperiment.finishedAllTrials()) {
+  currentExperiment.advanceToNextTrial();
+  
+  checkIfFinished();
+
+}
+
+void checkIfFinished(){
+  if (currentExperiment().finishedAllTrials() && !showConfidenceBar) {
     println("changing experiment index");
     currentExperimentIndex++;
     println("Moving to Experiment number " + String.valueOf(currentExperimentIndex));
@@ -352,9 +360,6 @@ void updateExperiment() {
     
     
   }
-  
-
-  
 }
 
 void drawExperiment() {
@@ -388,9 +393,6 @@ void drawFinishedExperiments() {
   textSize(24);
   text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + puntos + "\nTocá la tecla ENTER para salir.", width/2, height/2);
 
-  if (keyCode == ENTER) {
-    exit();
-  }
 }
 
 /* Logic */
@@ -488,15 +490,24 @@ void draw() {
 }
 
 void keyReleased() {
-  if (!hasUserAcceptedTerms || hasFinishedExperiments || interScreen) return;
+  if (!hasUserAcceptedTerms || interScreen) return;
   
   if(showConfidenceBar){
     if(keyCode == ENTER){
       currentExperiment().getCurrentBar().setConfidence();
       currentExperiment().currentBar++;
       showConfidenceBar = false;
+      checkIfFinished();
       timer = millis();
+      return;
     }
+  }
+  
+  if(hasFinishedExperiments){
+    if(keyCode == ENTER){
+      exit();
+    }
+    return;
   }
   
   if (keyCode == LEFT || keyCode == RIGHT) {
@@ -506,7 +517,7 @@ void keyReleased() {
     currentExperiment().getCurrentTrial().classified = true;
     currentExperiment().getCurrentTrial().correct = correct;
     currentExperiment().getCurrentTrial().time = millis() - timer;
-    println(correct ? "correct!" : "wrong!");
+    //println(correct ? "correct!" : "wrong!");
     
     if(correct){
       puntos++;
