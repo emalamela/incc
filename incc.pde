@@ -61,6 +61,8 @@ class ConfidenceBar {
   float circle_x;
   float circle_r;
   
+  float confidence;
+  
   boolean move;
   
   ConfidenceBar(){
@@ -75,6 +77,8 @@ class ConfidenceBar {
     circle_r = 20;
     
     move = false;
+    
+    confidence = 0;
   }
   
   void update(){
@@ -128,8 +132,13 @@ class ConfidenceBar {
   }
   
   float getConfidence(){
+    return confidence;
+    
+  }
+  
+  void setConfidence(){
     float offset = bar_x - bar_width/2;
-    return (circle_x - offset)/bar_width;
+    confidence = (circle_x - offset)/bar_width;
   }
 }
 
@@ -186,6 +195,15 @@ class Experiment {
     
     
     return trials[currentTrialIndex];
+  }
+  
+  String data(){
+    int bar = 0;
+    if(currentBar > 0){
+      bar = currentBar - 1;
+    }
+    
+    return getCurrentTrial().toString() + "\t" + confidenceBars[bar].getConfidence();
   }
 
   boolean finishedAllTrials() {
@@ -302,7 +320,7 @@ void updateExperiment() {
   Experiment currentExperiment = currentExperiment();
   
   try{
-    output.println("\n" + currentExperiment.getCurrentTrial().toString());
+    output.println("\n" + currentExperiment.data());
     println("Succesfully written data.");
     //output.flush();
   } catch(Exception e){
@@ -411,7 +429,7 @@ void setup() {
     String[] lines2 = loadStrings("data.txt");
     println("Succesfully loaded data file.");
     if(lines2.length==0){
-      output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)");
+      output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)\tconf");
       //output.flush();
       println("Succesfully written head data.");
   }
@@ -474,6 +492,8 @@ void keyReleased() {
   
   if(showConfidenceBar){
     if(keyCode == ENTER){
+      currentExperiment().getCurrentBar().setConfidence();
+      currentExperiment().currentBar++;
       showConfidenceBar = false;
       timer = millis();
     }
@@ -496,10 +516,7 @@ void keyReleased() {
     timer = millis();
     updateExperiment();
   }
-<<<<<<< HEAD
+
   
   
 }
-=======
-}
->>>>>>> 5082398a0f95d53b7f291a61a2eb03e8eb1357fd
