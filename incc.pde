@@ -51,12 +51,99 @@ class Trial {
   }
 }
 
+class ConfidenceBar {
+  float y;
+  
+  float bar_x;
+  float bar_width;
+  float bar_height;
+  
+  float circle_x;
+  float circle_r;
+  
+  boolean move;
+  
+  ConfidenceBar(){
+    y = height/2;
+    
+    bar_x = width/2;
+    circle_x = width/2;
+    
+    bar_width = width*0.6;
+    bar_height = 20;
+    
+    circle_r = 20;
+    
+    move = false;
+  }
+  
+  void update(){
+    if(mousePressed){
+      if(mouseX - circle_x < circle_r && mouseY - y < circle_r){
+        move = true;
+      }
+    } else{
+      move = false;
+    }
+    
+    if(move){
+      moveCircle(mouseX - pmouseX);
+    }
+  }
+  
+  void render(){
+    background(150);
+    
+    strokeWeight(2);
+    
+    stroke(0);
+    fill(100, 100, 255);
+    rect(bar_x - bar_width/2, y - bar_height/2, bar_width, bar_height);
+    
+    stroke(0, 0, 100);
+    fill(0, 0, 200);
+    ellipse(circle_x, y, circle_r*2, circle_r*2);
+    
+    //textMode(CENTER);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    fill(0);
+    text("Marcá en la barra cuán seguro\nestás de tus últimas decisiones", width/2, 100);
+    text("Apretá enter cuando estés\nconforme con tu respuesta", width/2, height - 100);
+    
+    textSize(16);
+    text("Nada\nseguro", bar_x - bar_width/2 - 40, y);
+    text("Totalmente\nseguro", bar_x + bar_width/2 + 50, y);
+  }
+  
+  void moveCircle(float amount){
+    circle_x = circle_x + amount;
+    if(circle_x > bar_x + bar_width/2){
+      circle_x = bar_x + bar_width/2;
+      move = false;
+    } else if(circle_x < bar_x - bar_width/2){
+      circle_x = bar_x - bar_width/2;
+      move = false;
+    }
+  }
+  
+  float getConfidence(){
+    float offset = bar_x - bar_width/2;
+    return (circle_x - offset)/bar_width;
+  }
+}
+
+
+
 class Experiment {
   final Rule rule;
   final Complexity complexity;
   final boolean isTimeBounded;
   final Trial[] trials;
   int currentTrialIndex;
+  
+  ConfidenceBar[] confidenceBars;
+  int currentBar;
 
   Experiment(Rule rule, Complexity complexity, boolean isTimeBounded, Trial[] trials) {
     this.rule = rule;
@@ -64,21 +151,40 @@ class Experiment {
     this.isTimeBounded = isTimeBounded;
     this.trials = trials;
     this.currentTrialIndex = 0;
+    
+    generateBars();
+    currentBar = 0;
   }
-
+  
+  void generateBars(){
+    confidenceBars = new ConfidenceBar[4];
+    
+    for(int i = 0; i<4; i++){
+      confidenceBars[i] = new ConfidenceBar();
+    }
+  }
+  
+  ConfidenceBar getCurrentBar(){
+    return confidenceBars[currentBar];
+  }
+  
   void advanceToNextTrial() {
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
-
+    print("Advancing to next Trial");
+    //println("Current Trial Index: "+currentTrialIndex);
+    //println("Number of Trials: "+trials.length);
     currentTrialIndex++;
   }
 
   Trial getCurrentTrial() {
     if (finishedAllTrials()) {
-      throw new IllegalStateException("Already finised trials for experiment " + toString());
+      printStackTrace(new IllegalStateException("Already finised trials for experiment " + toString()));
+      //throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
-
+    
+    
     return trials[currentTrialIndex];
   }
 
@@ -205,8 +311,13 @@ void updateExperiment() {
   }
   
   currentExperiment.advanceToNextTrial();
-
+  
+  if((currentExperiment.currentTrialIndex + 1) % expLength/4 == 0){
+    showConfidenceBar = true;
+  }
+  
   if (currentExperiment.finishedAllTrials()) {
+    println("changing experiment index");
     currentExperimentIndex++;
     println("Moving to Experiment number " + String.valueOf(currentExperimentIndex));
 
@@ -216,12 +327,17 @@ void updateExperiment() {
       try{
         //output.flush();
         output.close();
-        println("Succesfully closed data file.");
+        //println("Succesfully closed data file.");
       }catch(Exception e){
         println("There was an error closing the data file.");
       }
     }
+    
+    
   }
+  
+
+  
 }
 
 void drawExperiment() {
@@ -266,6 +382,9 @@ boolean hasUserAcceptedTerms = false;
 boolean hasFinishedExperiments = false;
 boolean interScreen = false;
 boolean correct = false;
+
+boolean showConfidenceBar = false;
+
 int currentExperimentIndex = 0;
 long timer = 0L;
 Experiment[] experiments;
@@ -343,6 +462,9 @@ void draw() {
     drawInterScreen();
   } else if (hasFinishedExperiments) {
     drawFinishedExperiments();
+  } else if (showConfidenceBar) {
+    currentExperiment().getCurrentBar().update();
+    currentExperiment().getCurrentBar().render();
   } else {
     drawExperiment();
   }
@@ -350,7 +472,14 @@ void draw() {
 
 void keyReleased() {
   if (!hasUserAcceptedTerms || hasFinishedExperiments || interScreen) return;
-
+  
+  if(showConfidenceBar){
+    if(keyCode == ENTER){
+      showConfidenceBar = false;
+      timer = millis();
+    }
+  }
+  
   if (keyCode == LEFT || keyCode == RIGHT) {
     Classification userClassification = keyCode == LEFT ? Classification.CLASS_A : Classification.CLASS_B;
     
@@ -368,4 +497,6 @@ void keyReleased() {
     timer = millis();
     updateExperiment();
   }
+  
+  
 }
