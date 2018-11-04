@@ -2,7 +2,6 @@ import java.util.Collections;
 import java.io.*;
 PrintStream output;
 PrintWriter numOutput;
-int puntos = 0;
 
 /* Declarations */
 
@@ -57,6 +56,7 @@ class Experiment {
   final boolean isTimeBounded;
   final Trial[] trials;
   int currentTrialIndex;
+  int points;
 
   Experiment(Rule rule, Complexity complexity, boolean isTimeBounded, Trial[] trials) {
     this.rule = rule;
@@ -64,13 +64,15 @@ class Experiment {
     this.isTimeBounded = isTimeBounded;
     this.trials = trials;
     this.currentTrialIndex = 0;
+    this.points = 0;
   }
 
-  void advanceToNextTrial() {
+  void advanceToNextTrial(boolean correct) {
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
-
+    
+    points += correct ? 1 : 0;
     currentTrialIndex++;
   }
 
@@ -140,7 +142,7 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
 }
 
 Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
-  Trial[] trials = new Trial[numTrials];
+  Trial[] trials = new Trial[numTrials]; //<>//
 
   int i = 0; //<>//
   for (Trial trial : allTrials) {
@@ -192,7 +194,7 @@ void drawTerms() {
   }
 }
 
-void updateExperiment() {
+void updateExperiment(boolean correct) {
   Experiment currentExperiment = currentExperiment();
   
   try{
@@ -203,7 +205,7 @@ void updateExperiment() {
     println("There was an error while writing to the data file");
   }
   
-  currentExperiment.advanceToNextTrial();
+  currentExperiment.advanceToNextTrial(correct);
 
   if (currentExperiment.finishedAllTrials()) {
     currentExperimentIndex++;
@@ -236,7 +238,7 @@ void drawExperiment() {
     }
 
     if (millis() - timer >= 2000) {
-      updateExperiment();
+      updateExperiment(false);
       timer = millis();
     } else {
       fill(0, 0, 200);
@@ -252,7 +254,10 @@ void drawFinishedExperiments() {
   fill(0, 0, 0);
   textAlign(CENTER, CENTER);
   textSize(24);
-  text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + puntos + "\nTocá la tecla ENTER para salir.", width/2, height/2);
+  int totalPoints = 0;
+  for (Experiment experiment : experiments) totalPoints += experiment.points;
+  
+  text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + totalPoints + "\nTocá la tecla ENTER para salir.", width/2, height/2);
 
   if (keyCode == ENTER) {
     exit();
@@ -359,12 +364,8 @@ void keyReleased() {
     currentExperiment().getCurrentTrial().time = millis() - timer;
     println(correct ? "correct!" : "wrong!");
     
-    if(correct){
-      puntos++;
-    }
-    
     interScreen = true;
     timer = millis();
-    updateExperiment();
+    updateExperiment(correct);
   }
 }
