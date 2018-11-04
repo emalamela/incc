@@ -110,7 +110,7 @@ String[] listFileNames(String dir) {
 }
 
 ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el formato "problem1_simple_1_classA.png"
-  String[] imgList = listFileNames(sketchPath());
+  String[] imgList = listFileNames(sketchPath() + "/data");
   ArrayList<Trial> allTrials = new ArrayList<Trial>();
   int i = 0;
   for (String name : imgList) {
