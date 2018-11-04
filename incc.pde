@@ -267,7 +267,7 @@ class Experiment {
 
 String[] listFileNames(String dir) {
   File file = new File(dir);
- //<>//
+ //<>// //<>//
   if (file.isDirectory()) {
     String names[] = file.list();
     return names;
@@ -310,7 +310,7 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
 Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
   Trial[] trials = new Trial[numTrials];
 
-  int i = 0; //<>//
+  int i = 0; //<>// //<>//
   for (Trial trial : allTrials) {
     if (i >= numTrials) break;
     if (trial.complexity == complexity && trial.rule == rule) {
@@ -570,6 +570,7 @@ void keyReleased() {
     if (keyCode == ENTER) {
       exit();
     }
+    return;
   }
 
   if (!hasUserAcceptedTerms) {
