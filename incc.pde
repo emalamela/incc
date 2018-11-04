@@ -56,6 +56,7 @@ class Experiment {
   final boolean isTimeBounded;
   final Trial[] trials;
   int currentTrialIndex;
+  boolean startedTrials;
   int points;
 
   Experiment(Rule rule, Complexity complexity, boolean isTimeBounded, Trial[] trials) {
@@ -64,6 +65,7 @@ class Experiment {
     this.isTimeBounded = isTimeBounded;
     this.trials = trials;
     this.currentTrialIndex = 0;
+    this.startedTrials = false;
     this.points = 0;
   }
 
@@ -80,12 +82,51 @@ class Experiment {
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
-
+    
+    if (!startedTrials) {
+      throw new IllegalStateException("Haven't started trials for experiment " + toString());
+    }
+    
     return trials[currentTrialIndex];
   }
 
   boolean finishedAllTrials() {
     return currentTrialIndex >= trials.length;
+  }
+  
+  String getInstructions() {
+    if (startedTrials) {
+      throw new IllegalStateException("Already shown instructions for experiment " + toString());
+    }
+    
+    String instructions = 
+        "Te vamos a mostrar un set de imágenes\n" + 
+        "que vas a tener que categorizar en 1 de 2 categorías:\n" + 
+        "Categoría A o Categoría B.\n" + 
+        "Para elegir la categoría A tenés que tocar la FLECHA IZQUIERDA y\n" + 
+        "Para la categoría B tenés que tocar la FLECHA DERECHA\n" + 
+        "Luego de cada respuesta te indicaremos si es CORRECTA o INCORRECTA.\n\n";
+        
+    if (isTimeBounded) {
+      instructions += 
+          "Vas a tener solo " + millisPerBoundedExperiment / 1000 + " SEGUNDOS por imagen para responder!\n\n";
+    } else {
+      instructions += 
+          "Tenés tiempo ilimitado para responder!\n\n";
+    }
+    
+    instructions +=
+        "Leé bien las instrucciones y después tocá ENTER para comenzar!";
+    
+    return instructions;
+  }
+  
+  void startTrials() {
+    if (startedTrials) {
+      throw new IllegalStateException("Trials already started");
+    }
+    
+    startedTrials = true;
   }
 
   @Override
@@ -101,7 +142,7 @@ class Experiment {
 
 String[] listFileNames(String dir) {
   File file = new File(dir);
-
+ //<>//
   if (file.isDirectory()) {
     String names[] = file.list();
     return names;
@@ -142,7 +183,7 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
 }
 
 Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
-  Trial[] trials = new Trial[numTrials]; //<>//
+  Trial[] trials = new Trial[numTrials];
 
   int i = 0; //<>//
   for (Trial trial : allTrials) {
@@ -182,10 +223,10 @@ Experiment[] generateExperimentSet() {
 String[] generateGeneralInstructions() {
   String greetingInstruction = "Hola!\n" +
                                "Bienvenido al Experimento.\n\n\n" + 
-                               "Para avanzar toque la tecla ENTER.";
+                               "Para avanzar tocá la tecla ENTER.";
   String exercisesInstruction = "A continuación se le presenteran una serie de 2 ejercicios.\n" + 
-                                "Le pedimos que lea atentamente las instrucciones antes de comenzar con cada uno de ellos.\n\n\n"+
-                                "Para avanzar toque la tecla ENTER.";
+                                "Te pedimos que leas atentamente las instrucciones antes de comenzar con cada uno de ellos.\n\n\n"+
+                                "Para avanzar tocá la tecla ENTER.";
   return new String[]{greetingInstruction, exercisesInstruction};
 }
 
@@ -206,8 +247,9 @@ String currentGeneralInstruction() {
 }
 
 void drawTerms() {
+  fill(255, 255, 255);
   background(100);
-  textAlign(CENTER);
+  textAlign(CENTER, CENTER);
   textSize(24);
   text(currentGeneralInstruction(), width/2, height/2);
 }
@@ -244,9 +286,20 @@ void updateExperiment(boolean answeredCorrectly) {
 }
 
 void drawExperiment() {
-  if (hasFinishedExperiments) return;
+  if (hasFinishedExperiments) return; 
 
   Experiment currentExperiment = currentExperiment();
+  
+  if (!currentExperiment.startedTrials) {
+    fill(255, 255, 255);
+    background(100);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    String instructionsTitle = "EJERCICIO " + (currentExperimentIndex + 1) + "\n\n";
+    text(instructionsTitle + currentExperiment.getInstructions(), width/2, height/2);
+    return;
+  }
+  
   currentExperiment.getCurrentTrial().render();
 
   if (currentExperiment.isTimeBounded) {
@@ -255,7 +308,7 @@ void drawExperiment() {
       timer = millis();
     }
 
-    if (millis() - timer >= 2000) {
+    if (millis() - timer >= millisPerBoundedExperiment) {
       updateExperiment(false);
       timer = millis();
     } else {
@@ -291,6 +344,7 @@ boolean correct = false;
 int currentGeneralInstructionIndex = 0;
 int currentExperimentIndex = 0;
 long timer = 0L;
+long millisPerBoundedExperiment = 2000; 
 String[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
@@ -320,7 +374,7 @@ void setup() {
       output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)");
       //output.flush();
       println("Succesfully written head data.");
-  }
+    }
   } catch(Exception e){
     println("There was an error opening the data file.");
   }
@@ -344,10 +398,9 @@ void drawInterScreen() {
   if (correct) {
     background(0, 200, 0);
     text("¡CORRECTO! +1", width/2, height/2);
-
   } else {
     background(200, 0, 0);
-    text("ERROR :(", width/2, height/2);
+    text("INCORRECTO :(", width/2, height/2);
   }
 
   if (timer == 0L) {
@@ -392,13 +445,22 @@ void handleGeneralInstructionKeyReleased() {
 }
 
 void handleExperimentKeyReleased() {
+  Experiment currentExperiment = currentExperiment();
+  
+  if (keyCode == ENTER) {
+    if (!currentExperiment.startedTrials) {
+      currentExperiment.startTrials();
+    }
+  }
+  
   if (keyCode == LEFT || keyCode == RIGHT) {
     Classification userClassification = keyCode == LEFT ? Classification.CLASS_A : Classification.CLASS_B;
     
-    correct = currentExperiment().getCurrentTrial().classification == userClassification;
-    currentExperiment().getCurrentTrial().classified = true;
-    currentExperiment().getCurrentTrial().correct = correct;
-    currentExperiment().getCurrentTrial().time = millis() - timer;
+    Trial currentTrial = currentExperiment.getCurrentTrial();
+    correct = currentTrial.classification == userClassification;
+    currentTrial.classified = true;
+    currentTrial.correct = correct;
+    currentTrial.time = millis() - timer;
     println(correct ? "correct!" : "wrong!");
     
     interScreen = true;
