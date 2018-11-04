@@ -179,22 +179,40 @@ Experiment[] generateExperimentSet() {
   return new Experiment[]{firstExperiment, secondExperiment};
 }
 
+String[] generateGeneralInstructions() {
+  String greetingInstruction = "Hola!\n" +
+                               "Bienvenido al Experimento.\n\n\n" + 
+                               "Para avanzar toque la tecla ENTER.";
+  String exercisesInstruction = "A continuación se le presenteran una serie de 2 ejercicios.\n" + 
+                                "Le pedimos que lea atentamente las instrucciones antes de comenzar con cada uno de ellos.\n\n\n"+
+                                "Para avanzar toque la tecla ENTER.";
+  return new String[]{greetingInstruction, exercisesInstruction};
+}
+
 Experiment currentExperiment() {
+  if (currentExperimentIndex < 0 || currentExperimentIndex > experiments.length) {
+    throw new IndexOutOfBoundsException("currentExperimentIndex is out of bounds!");
+  }
+  
   return experiments[currentExperimentIndex];
+}
+
+String currentGeneralInstruction() {
+  if (currentGeneralInstructionIndex < 0 || currentGeneralInstructionIndex > generalInstructions.length) {
+    throw new IndexOutOfBoundsException("currentGeneralInstructionIndex is out of bounds!");
+  }
+  
+  return generalInstructions[currentGeneralInstructionIndex];
 }
 
 void drawTerms() {
   background(100);
   textAlign(CENTER);
   textSize(24);
-  text("¡Tocá la tecla ENTER para comenzar!", width/2, height/2);
-
-  if (keyCode == ENTER) {
-    hasUserAcceptedTerms = true;
-  }
+  text(currentGeneralInstruction(), width/2, height/2);
 }
 
-void updateExperiment(boolean correct) {
+void updateExperiment(boolean answeredCorrectly) {
   Experiment currentExperiment = currentExperiment();
   
   try{
@@ -205,7 +223,7 @@ void updateExperiment(boolean correct) {
     println("There was an error while writing to the data file");
   }
   
-  currentExperiment.advanceToNextTrial(correct);
+  currentExperiment.advanceToNextTrial(answeredCorrectly);
 
   if (currentExperiment.finishedAllTrials()) {
     currentExperimentIndex++;
@@ -270,8 +288,10 @@ boolean hasUserAcceptedTerms = false;
 boolean hasFinishedExperiments = false;
 boolean interScreen = false;
 boolean correct = false;
+int currentGeneralInstructionIndex = 0;
 int currentExperimentIndex = 0;
 long timer = 0L;
+String[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
 int expNumber;
@@ -308,6 +328,7 @@ void setup() {
   
   allTrials = generateAllTrials();
   experiments = generateExperimentSet();
+  generalInstructions = generateGeneralInstructions();
 
   println("Experiment #1 is " + experiments[0].toString());
   println("Experiment #2 is " + experiments[1].toString());
@@ -353,8 +374,24 @@ void draw() {
 }
 
 void keyReleased() {
-  if (!hasUserAcceptedTerms || hasFinishedExperiments || interScreen) return;
+  if (hasFinishedExperiments || interScreen) return;
 
+  if (!hasUserAcceptedTerms) {
+    handleGeneralInstructionKeyReleased();
+  } else {
+    handleExperimentKeyReleased();
+  }
+}
+
+void handleGeneralInstructionKeyReleased() {
+  if (keyCode == ENTER) {
+    currentGeneralInstructionIndex++;
+    
+    hasUserAcceptedTerms = currentGeneralInstructionIndex >= generalInstructions.length;
+  }
+}
+
+void handleExperimentKeyReleased() {
   if (keyCode == LEFT || keyCode == RIGHT) {
     Classification userClassification = keyCode == LEFT ? Classification.CLASS_A : Classification.CLASS_B;
     
