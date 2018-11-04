@@ -154,13 +154,12 @@ Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
   return trials;
 }
 
-// TODO: Un-hardcode Complexity
 Experiment generateRandomExperiment() {
   Rule randomRule = Rule.values()[int(random(Rule.values().length))];
   Complexity randomComplexity = Complexity.values()[int(random(Complexity.values().length))];
   boolean isTimeBounded = random(1) > 0.5f;
 
-  return new Experiment(randomRule, randomComplexity, isTimeBounded, generateTrials(Rule.B_35, Complexity.SIMPLE, expLength));
+  return new Experiment(randomRule, randomComplexity, isTimeBounded, generateTrials(randomRule, randomComplexity, expLength));
 }
 
 Experiment generateComplimentaryExperiment(Experiment otherExperiment) {
@@ -168,7 +167,7 @@ Experiment generateComplimentaryExperiment(Experiment otherExperiment) {
   Complexity complimentaryComplexity = otherExperiment.complexity == Complexity.SIMPLE ? Complexity.COMPLEX : Complexity.SIMPLE;
   boolean isTimeBounded = !otherExperiment.isTimeBounded;
 
-  return new Experiment(complimentaryRule, complimentaryComplexity, isTimeBounded, generateTrials(complimentaryRule, Complexity.SIMPLE, expLength));
+  return new Experiment(complimentaryRule, complimentaryComplexity, isTimeBounded, generateTrials(complimentaryRule, complimentaryComplexity, expLength));
 }
 
 Experiment[] generateExperimentSet() {
