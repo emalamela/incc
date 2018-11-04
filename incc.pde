@@ -2,7 +2,6 @@ import java.util.Collections;
 import java.io.*;
 PrintStream output;
 PrintWriter numOutput;
-int puntos = 0;
 
 /* Declarations */
 
@@ -150,8 +149,9 @@ class Experiment {
   final boolean isTimeBounded;
   final Trial[] trials;
   int currentTrialIndex;
-  
-  ConfidenceBar[] confidenceBars;
+  boolean startedTrials;
+  int points;
+  final ConfidenceBar[] confidenceBars;
   int currentBar;
 
   Experiment(Rule rule, Complexity complexity, boolean isTimeBounded, Trial[] trials) {
@@ -160,46 +160,53 @@ class Experiment {
     this.isTimeBounded = isTimeBounded;
     this.trials = trials;
     this.currentTrialIndex = 0;
-    
-    generateBars();
+    this.startedTrials = false;
+    this.points = 0;
+    this.confidenceBars = generateBars();
     currentBar = 0;
   }
   
-  void generateBars(){
-    confidenceBars = new ConfidenceBar[4];
+  ConfidenceBar[] generateBars(){
+    ConfidenceBar[] confidenceBars = new ConfidenceBar[4];
     
-    for(int i = 0; i<4; i++){
+    for (int i = 0; i < 4; i++) {
       confidenceBars[i] = new ConfidenceBar();
     }
+
+    return confidenceBars;
   }
   
-  ConfidenceBar getCurrentBar(){
+  ConfidenceBar getCurrentBar() {
     return confidenceBars[currentBar];
   }
   
-  void advanceToNextTrial() {
-    println("Trial " + currentExperiment().currentTrialIndex + " % " + expLength/4 +" = " + currentExperiment().currentTrialIndex % (expLength/4));
+  void advanceToNextTrial(boolean correct) {
+    if (finishedAllTrials()) {
+      throw new IllegalStateException("Already finised trials for experiment " + toString());
+    }
+    
+    points += correct ? 1 : 0;
     
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
-    //println("Advancing to next Trial");
-    //println("Current Trial Index: "+currentTrialIndex);
-    //println("Number of Trials: "+trials.length);
+    println("Trial " + currentExperiment().currentTrialIndex + " % " + expLength/4 +" = " + currentExperiment().currentTrialIndex % (expLength/4));
     currentTrialIndex++;
   }
 
   Trial getCurrentTrial() {
     if (finishedAllTrials()) {
       printStackTrace(new IllegalStateException("Already finised trials for experiment " + toString()));
-      //throw new IllegalStateException("Already finised trials for experiment " + toString());
     }
     
+    if (!startedTrials) {
+      printStackTrace(new IllegalStateException("Haven't started trials for experiment " + toString()));
+    }
     
     return trials[currentTrialIndex];
   }
   
-  String data(){
+  String data() {
     int bar = 0;
     if(currentBar > 0){
       bar = currentBar - 1;
@@ -211,9 +218,44 @@ class Experiment {
   boolean finishedAllTrials() {
     return currentTrialIndex >= trials.length;
   }
+  
+  String getInstructions() {
+    if (startedTrials) {
+      throw new IllegalStateException("Already shown instructions for experiment " + toString());
+    }
+    
+    String instructions = 
+        "Te vamos a mostrar un set de imágenes\n" + 
+        "que vas a tener que categorizar en 1 de 2 categorías:\n" + 
+        "Categoría A o Categoría B.\n" + 
+        "Para elegir la categoría A tenés que tocar la FLECHA IZQUIERDA y\n" + 
+        "Para la categoría B tenés que tocar la FLECHA DERECHA\n" + 
+        "Luego de cada respuesta te indicaremos si es CORRECTA o INCORRECTA.\n\n";
+        
+    if (isTimeBounded) {
+      instructions += 
+          "Vas a tener solo " + millisPerBoundedExperiment / 1000 + " SEGUNDOS por imagen para responder!\n\n";
+    } else {
+      instructions += 
+          "Tenés tiempo ilimitado para responder!\n\n";
+    }
+    
+    instructions +=
+        "Leé bien las instrucciones y después tocá ENTER para comenzar!";
+    
+    return instructions;
+  }
+  
+  void startTrials() {
+    if (startedTrials) {
+      throw new IllegalStateException("Trials already started");
+    }
+    
+    startedTrials = true;
+  }
 
   @Override
-    public String toString() {
+  public String toString() {
     return "Experiment(rule=" + rule.toString() + 
       ", complexity=" + complexity.toString() + 
       ", isTimeBounded=" + String.valueOf(isTimeBounded) + 
@@ -225,7 +267,7 @@ class Experiment {
 
 String[] listFileNames(String dir) {
   File file = new File(dir);
-
+ //<>// //<>//
   if (file.isDirectory()) {
     String names[] = file.list();
     return names;
@@ -268,7 +310,7 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
 Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
   Trial[] trials = new Trial[numTrials];
 
-  int i = 0; //<>//
+  int i = 0; //<>// //<>//
   for (Trial trial : allTrials) {
     if (i >= numTrials) break;
     if (trial.complexity == complexity && trial.rule == rule) {
@@ -303,22 +345,41 @@ Experiment[] generateExperimentSet() {
   return new Experiment[]{firstExperiment, secondExperiment};
 }
 
+String[] generateGeneralInstructions() {
+  String greetingInstruction = "Hola!\n" +
+                               "Bienvenido al Experimento.\n\n\n" + 
+                               "Para avanzar tocá la tecla ENTER.";
+  String exercisesInstruction = "A continuación se le presenteran una serie de 2 ejercicios.\n" + 
+                                "Te pedimos que leas atentamente las instrucciones antes de comenzar con cada uno de ellos.\n\n\n"+
+                                "Para avanzar tocá la tecla ENTER.";
+  return new String[]{greetingInstruction, exercisesInstruction};
+}
+
 Experiment currentExperiment() {
+  if (currentExperimentIndex < 0 || currentExperimentIndex > experiments.length) {
+    throw new IndexOutOfBoundsException("currentExperimentIndex is out of bounds!");
+  }
+  
   return experiments[currentExperimentIndex];
 }
 
-void drawTerms() {
-  background(100);
-  textAlign(CENTER);
-  textSize(24);
-  text("¡Tocá la tecla ENTER para comenzar!", width/2, height/2);
-
-  if (keyCode == ENTER) {
-    hasUserAcceptedTerms = true;
+String currentGeneralInstruction() {
+  if (currentGeneralInstructionIndex < 0 || currentGeneralInstructionIndex > generalInstructions.length) {
+    throw new IndexOutOfBoundsException("currentGeneralInstructionIndex is out of bounds!");
   }
+  
+  return generalInstructions[currentGeneralInstructionIndex];
 }
 
-void updateExperiment() {
+void drawTerms() {
+  fill(255, 255, 255);
+  background(100);
+  textAlign(CENTER, CENTER);
+  textSize(24);
+  text(currentGeneralInstruction(), width/2, height/2);
+}
+
+void updateExperiment(boolean answeredCorrectly) {
   Experiment currentExperiment = currentExperiment();
   
   try{
@@ -329,12 +390,11 @@ void updateExperiment() {
     println("There was an error while writing to the data file");
   }
   
-  
-  if(currentExperiment.currentTrialIndex % (expLength/4) == 1){
+  if (currentExperiment.currentTrialIndex % (expLength/4) == 1){
     showConfidenceBar = true;
   }
   
-  currentExperiment.advanceToNextTrial();
+  currentExperiment.advanceToNextTrial(answeredCorrectly);
   
   checkIfFinished();
 
@@ -363,9 +423,20 @@ void checkIfFinished(){
 }
 
 void drawExperiment() {
-  if (hasFinishedExperiments) return;
+  if (hasFinishedExperiments) return; 
 
   Experiment currentExperiment = currentExperiment();
+  
+  if (!currentExperiment.startedTrials) {
+    fill(255, 255, 255);
+    background(100);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    String instructionsTitle = "EJERCICIO " + (currentExperimentIndex + 1) + "\n\n";
+    text(instructionsTitle + currentExperiment.getInstructions(), width/2, height/2);
+    return;
+  }
+  
   currentExperiment.getCurrentTrial().render();
 
   if (currentExperiment.isTimeBounded) {
@@ -374,8 +445,8 @@ void drawExperiment() {
       timer = millis();
     }
 
-    if (millis() - timer >= 2000) {
-      updateExperiment();
+    if (millis() - timer >= millisPerBoundedExperiment) {
+      updateExperiment(false);
       timer = millis();
     } else {
       fill(0, 0, 200);
@@ -391,8 +462,10 @@ void drawFinishedExperiments() {
   fill(0, 0, 0);
   textAlign(CENTER, CENTER);
   textSize(24);
-  text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + puntos + "\nTocá la tecla ENTER para salir.", width/2, height/2);
-
+  int totalPoints = 0;
+  for (Experiment experiment : experiments) totalPoints += experiment.points;
+  
+  text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + totalPoints + "\nTocá la tecla ENTER para salir.", width/2, height/2);
 }
 
 /* Logic */
@@ -401,11 +474,12 @@ boolean hasUserAcceptedTerms = false;
 boolean hasFinishedExperiments = false;
 boolean interScreen = false;
 boolean correct = false;
-
+int currentGeneralInstructionIndex = 0;
 boolean showConfidenceBar = false;
-
 int currentExperimentIndex = 0;
 long timer = 0L;
+long millisPerBoundedExperiment = 2000; 
+String[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
 int expNumber;
@@ -434,7 +508,7 @@ void setup() {
       output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)\tconf");
       //output.flush();
       println("Succesfully written head data.");
-  }
+    }
   } catch(Exception e){
     println("There was an error opening the data file.");
   }
@@ -442,6 +516,7 @@ void setup() {
   
   allTrials = generateAllTrials();
   experiments = generateExperimentSet();
+  generalInstructions = generateGeneralInstructions();
 
   println("Experiment #1 is " + experiments[0].toString());
   println("Experiment #2 is " + experiments[1].toString());
@@ -457,10 +532,9 @@ void drawInterScreen() {
   if (correct) {
     background(0, 200, 0);
     text("¡CORRECTO! +1", width/2, height/2);
-
   } else {
     background(200, 0, 0);
-    text("ERROR :(", width/2, height/2);
+    text("INCORRECTO :(", width/2, height/2);
   }
 
   if (timer == 0L) {
@@ -490,22 +564,47 @@ void draw() {
 }
 
 void keyReleased() {
-  if (!hasUserAcceptedTerms || interScreen) return;
+  if (interScreen) return;
+
+  if (hasFinishedExperiments) {
+    if (keyCode == ENTER) {
+      exit();
+    }
+    return;
+  }
+
+  if (!hasUserAcceptedTerms) {
+    handleGeneralInstructionKeyReleased();
+  } else {
+    handleExperimentKeyReleased();
+  }
+}
+
+void handleGeneralInstructionKeyReleased() {
+  if (keyCode == ENTER) {
+    currentGeneralInstructionIndex++;
+    
+    hasUserAcceptedTerms = currentGeneralInstructionIndex >= generalInstructions.length;
+  }
+}
+
+void handleExperimentKeyReleased() {
+  Experiment currentExperiment = currentExperiment();
   
-  if(showConfidenceBar){
-    if(keyCode == ENTER){
-      currentExperiment().getCurrentBar().setConfidence();
-      currentExperiment().currentBar++;
+  if (!currentExperiment.startedTrials) {
+    if (keyCode == ENTER) {
+      currentExperiment.startTrials();
+    }
+    return;
+  }
+
+  if (showConfidenceBar) {
+    if (keyCode == ENTER) {
+      currentExperiment.getCurrentBar().setConfidence();
+      currentExperiment.currentBar++;
       showConfidenceBar = false;
       checkIfFinished();
       timer = millis();
-      return;
-    }
-  }
-  
-  if(hasFinishedExperiments){
-    if(keyCode == ENTER){
-      exit();
     }
     return;
   }
@@ -513,21 +612,16 @@ void keyReleased() {
   if (keyCode == LEFT || keyCode == RIGHT) {
     Classification userClassification = keyCode == LEFT ? Classification.CLASS_A : Classification.CLASS_B;
     
-    correct = currentExperiment().getCurrentTrial().classification == userClassification;
-    currentExperiment().getCurrentTrial().classified = true;
-    currentExperiment().getCurrentTrial().correct = correct;
-    currentExperiment().getCurrentTrial().time = millis() - timer;
+    Trial currentTrial = currentExperiment.getCurrentTrial();
+    correct = currentTrial.classification == userClassification;
+    currentTrial.classified = true;
+    currentTrial.correct = correct;
+    currentTrial.time = millis() - timer;
     //println(correct ? "correct!" : "wrong!");
-    
-    if(correct){
-      puntos++;
-    }
     
     interScreen = true;
     timer = millis();
-    updateExperiment();
+    updateExperiment(correct);
+    return;
   }
-
-  
-  
 }
