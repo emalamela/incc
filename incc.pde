@@ -256,7 +256,7 @@ class Experiment {
     if (startedTrials) {
       throw new IllegalStateException("Trials already started");
     }
-    
+    timer = millis();
     startedTrials = true;
   }
 
