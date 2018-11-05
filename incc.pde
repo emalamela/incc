@@ -356,7 +356,7 @@ String[] generateGeneralInstructions() {
                                "Bienvenido al Experimento.\n\n\n" + 
                                "Para avanzar tocá la tecla ENTER.";
   String exercisesInstruction = "A continuación se le presenteran una serie de 2 ejercicios.\n" + 
-                                "Te pedimos que leas atentamente las instrucciones antes de comenzar con cada uno de ellos.\n\n\n"+
+                                "Te pedimos que leas atentamente las instrucciones\nantes de comenzar con cada uno de ellos.\n\n\n"+
                                 "Para avanzar tocá la tecla ENTER.";
   return new String[]{greetingInstruction, exercisesInstruction};
 }
