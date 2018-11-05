@@ -38,10 +38,16 @@ class Trial {
     this.classified = false;
     this.correct = false;
     this.time = 0f;
+    
+    
+    float scale = height/img.height;
+    scale *= 0.8;
+    img.resize((int)(scale*img.width), (int)(scale*img.height));
   }
-
+  
   void render() {
-    image(img, 0, 0);
+    background(255);
+    image(img, width/2 - img.width/2, height/2 - img.height/2);
   }
   
   @Override
@@ -485,8 +491,8 @@ ArrayList<Trial> allTrials;
 int expNumber;
 
 void setup() {
-  //fullScreen();
-  size(600, 600);
+  fullScreen();
+ // size(600, 600);
   
   background(100);
   frameRate(30);
