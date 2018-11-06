@@ -419,11 +419,9 @@ void checkIfFinished(){
 
     if (currentExperimentIndex >= experiments.length) {
       println("Finishing experiments");
-      output.println("##\t##\t##\t##\t##\t##\t##\t##");
       hasFinishedExperiments = true;
       try{
         //output.flush();
-        output.close();
         //println("Succesfully closed data file.");
       }catch(Exception e){
         println("There was an error closing the data file.");
@@ -578,16 +576,22 @@ void draw() {
   }
 }
 
+void finish(){
+    output.println("##\t##\t##\t##\t##\t##\t##\t##");
+    output.close();
+    exit();
+}
+
 void keyReleased() {
   if(keyCode == ESC){
-    exit();
+    finish();
   }
   
   if (interScreen) return;
 
   if (hasFinishedExperiments) {
     if (keyCode == ENTER) {
-      exit();
+      finish();
     }
     return;
   }

@@ -69,3 +69,36 @@ img	rule	cmplx	class	done	correct	t(ms)	conf
 207	ASHBY	COMPLEX	CLASS_A	true	false	1335.0	0.0
 
 268	ASHBY	COMPLEX	CLASS_B	true	false	667.0	0.0
+
+199	B_35	SIMPLE	CLASS_B	true	true	732.0	0.0
+
+193	B_35	SIMPLE	CLASS_B	true	false	64.0	0.0
+
+105	B_35	SIMPLE	CLASS_A	true	true	869.0	0.5
+
+166	B_35	SIMPLE	CLASS_B	true	true	1199.0	0.5
+
+101	B_35	SIMPLE	CLASS_A	true	false	501.0	0.5
+
+198	B_35	SIMPLE	CLASS_B	true	false	1066.0	0.5
+
+124	B_35	SIMPLE	CLASS_A	true	true	1172.0	0.5
+
+143	B_35	SIMPLE	CLASS_A	true	true	968.0	0.5
+
+282	ASHBY	COMPLEX	CLASS_B	true	true	1297.0	0.0
+
+210	ASHBY	COMPLEX	CLASS_A	true	true	1633.0	0.0
+
+249	ASHBY	COMPLEX	CLASS_A	true	true	934.0	0.5
+
+258	ASHBY	COMPLEX	CLASS_B	true	false	969.0	0.5
+
+209	ASHBY	COMPLEX	CLASS_A	true	false	1933.0	0.5
+
+234	ASHBY	COMPLEX	CLASS_A	true	true	2235.0	0.5
+
+261	ASHBY	COMPLEX	CLASS_B	true	true	1800.0	0.5
+
+229	ASHBY	COMPLEX	CLASS_A	true	true	2369.0	0.5
+##	##	##	##	##	##	##	##
