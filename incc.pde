@@ -1,7 +1,12 @@
 import java.util.Collections;
 import java.io.*;
+import processing.sound.*;
+
 PrintStream output;
 //PrintWriter numOutput;
+
+SoundFile right;
+SoundFile wrong;
 
 /* Declarations */
 
@@ -528,6 +533,9 @@ void setup() {
   println("Experiment #1 is " + experiments[0].toString());
   println("Experiment #2 is " + experiments[1].toString());
   
+  right = new SoundFile(this, "data/correct.wav");
+  wrong = new SoundFile(this, "data/wrong.wav");
+  
   frame.requestFocus();
 }
 
@@ -549,7 +557,7 @@ void drawInterScreen() {
     timer = millis();
   }
 
-  if (millis() - timer >= 1000) {
+  if (millis() - timer >= 2000) {
     interScreen = false;
     timer = millis();
   }
@@ -571,6 +579,10 @@ void draw() {
 }
 
 void keyReleased() {
+  if(keyCode == ESC){
+    exit();
+  }
+  
   if (interScreen) return;
 
   if (hasFinishedExperiments) {
@@ -625,6 +637,12 @@ void handleExperimentKeyReleased() {
     currentTrial.correct = correct;
     currentTrial.time = millis() - timer;
     //println(correct ? "correct!" : "wrong!");
+    
+    if(correct){
+      right.play();
+    } else {
+      wrong.play();
+    }
     
     interScreen = true;
     timer = millis();
