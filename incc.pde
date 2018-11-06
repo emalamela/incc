@@ -10,7 +10,7 @@ SoundFile wrong;
 
 /* Declarations */
 
-int expLength = 8;
+int expLength = 16;
 
 enum Rule {
   B_35, ASHBY
@@ -401,8 +401,14 @@ void updateExperiment(boolean answeredCorrectly) {
     println("There was an error while writing to the data file");
   }
   
-  if (currentExperiment.currentTrialIndex % (expLength/4) == 1){
+  if (currentExperiment.currentTrialIndex % (expLength/4) == expLength/4 - 1){
     showConfidenceBar = true;
+  }
+  
+  if(answeredCorrectly){
+    correctInARow++;
+  } else {
+    correctInARow = 0;
   }
   
   currentExperiment.advanceToNextTrial(answeredCorrectly);
@@ -412,9 +418,11 @@ void updateExperiment(boolean answeredCorrectly) {
 }
 
 void checkIfFinished(){
-  if (currentExperiment().finishedAllTrials() && !showConfidenceBar) {
+  
+  if ((currentExperiment().finishedAllTrials() || correctInARow >= 8) && !showConfidenceBar) {
     println("changing experiment index");
     currentExperimentIndex++;
+    correctInARow = 0;
     println("Moving to Experiment number " + String.valueOf(currentExperimentIndex));
 
     if (currentExperimentIndex >= experiments.length) {
@@ -494,9 +502,13 @@ Experiment[] experiments;
 ArrayList<Trial> allTrials;
 //int expNumber;
 
+
+boolean lastRight = false;
+int correctInARow = 0;
+
 void setup() {
-  fullScreen();
- // size(600, 600);
+  //fullScreen();
+  size(600, 600);
   
   background(100);
   frameRate(30);
