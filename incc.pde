@@ -1,7 +1,7 @@
 import java.util.Collections;
 import java.io.*;
 PrintStream output;
-PrintWriter numOutput;
+//PrintWriter numOutput;
 
 /* Declarations */
 
@@ -52,7 +52,7 @@ class Trial {
   
   @Override
   public String toString(){
-    return expNumber + "\t" + id + "\t" + rule + "\t" + complexity + "\t" + classification + "\t" + classified + "\t" + correct + "\t" + time;
+    return id + "\t" + rule + "\t" + complexity + "\t" + classification + "\t" + classified + "\t" + correct + "\t" + time;
   }
 }
 
@@ -414,6 +414,7 @@ void checkIfFinished(){
 
     if (currentExperimentIndex >= experiments.length) {
       println("Finishing experiments");
+      output.println("##\t##\t##\t##\t##\t##\t##\t##");
       hasFinishedExperiments = true;
       try{
         //output.flush();
@@ -488,7 +489,7 @@ long millisPerBoundedExperiment = 2000;
 String[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
-int expNumber;
+//int expNumber;
 
 void setup() {
   fullScreen();
@@ -499,19 +500,19 @@ void setup() {
   
   println("Starting to load files.");
   
-  String[] lines = loadStrings("numExp.txt");
+  /*String[] lines = loadStrings("numExp.txt");
   expNumber = Integer.parseInt(lines[0]);
   numOutput = createWriter("numExp.txt");
   numOutput.println((expNumber+1)+"");
   numOutput.flush();
-  numOutput.close();
+  numOutput.close();*/
   
   try{
     output = new PrintStream(new FileOutputStream(new File(sketchPath() + "/data.txt"), true));
     String[] lines2 = loadStrings("data.txt");
     println("Succesfully loaded data file.");
     if(lines2.length==0){
-      output.println("n\tid\trule\tcmplx\tclass\tdone\tcorrect\ttime(ms)\tconf");
+      output.println("img\trule\tcmplx\tclass\tdone\tcorrect\tt(ms)\tconf");
       //output.flush();
       println("Succesfully written head data.");
     }
