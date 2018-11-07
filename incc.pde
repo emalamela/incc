@@ -19,7 +19,7 @@ PImage instructionTimeless;
 
 /* Declarations */
 
-int expLength = 16;
+int expLength = 100;
 
 ArrayList<Trial> tutorialTrials;
 
@@ -571,8 +571,8 @@ boolean lastRight = false;
 int correctInARow = 0;
 
 void setup() {
-  //fullScreen();
-  size(800, 600);
+  fullScreen();
+  //size(800, 600);
   
   background(100);
   frameRate(30);

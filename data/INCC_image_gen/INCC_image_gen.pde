@@ -1,6 +1,6 @@
 float rel_tr_height = sqrt(3)/2;
 int counter;
-int problem = 1;
+int problem = 0;
 String classif = "NOTVALID";
 
 void setup() {
