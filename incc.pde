@@ -11,6 +11,12 @@ SoundFile wrong;
 PImage a;
 PImage b;
 
+PImage welcome1;
+PImage welcome2;
+PImage instructionTutorial;
+PImage instructionBounded;
+PImage instructionTimeless;
+
 /* Declarations */
 
 int expLength = 16;
@@ -259,31 +265,19 @@ class Experiment {
     return currentTrialIndex >= trials.length;
   }
   
-  String getInstructions() {
+  PImage getInstructions() {
     if (startedTrials) {
       throw new IllegalStateException("Already shown instructions for experiment " + toString());
     }
     
-    String instructions = 
-        "Te vamos a mostrar un set de imágenes\n" + 
-        "que vas a tener que categorizar en 1 de 2 categorías:\n" + 
-        "Categoría A o Categoría B.\n" + 
-        "Para elegir la categoría A tenés que tocar la FLECHA IZQUIERDA y\n" + 
-        "Para la categoría B tenés que tocar la FLECHA DERECHA\n" + 
-        "Luego de cada respuesta te indicaremos si es CORRECTA o INCORRECTA.\n\n";
-        
-    if (isTimeBounded) {
-      instructions += 
-          "Vas a tener solo " + millisPerBoundedExperiment / 1000 + " SEGUNDOS por imagen para responder!\n\n";
+    if(isTutorial){
+      return instructionTutorial;
+    } else if (isTimeBounded) {
+      return instructionBounded;
     } else {
-      instructions += 
-          "Tenés tiempo ilimitado para responder!\n\n";
+      return instructionTimeless;
     }
     
-    instructions +=
-        "Leé bien las instrucciones y después tocá ENTER para comenzar!";
-    
-    return instructions;
   }
   
   void startTrials() {
@@ -327,7 +321,7 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
   int i = 0;
   for (String name : imgList) {
     //println(name);
-    if (!name.contains("png") || name.contains("tutorial")) continue;
+    if (!name.contains("png") || !(name.contains("problem1") || name.contains("problem2"))) continue;
     name = name.substring(0, name.lastIndexOf("."));
     //println(name);
 
@@ -424,14 +418,8 @@ Experiment[] generateExperimentSet() {
   return new Experiment[]{tutorial, firstExperiment, secondExperiment};
 }
 
-String[] generateGeneralInstructions() {
-  String greetingInstruction = "Hola!\n" +
-                               "Bienvenido al Experimento.\n\n\n" + 
-                               "Para avanzar tocá la tecla ENTER.";
-  String exercisesInstruction = "A continuación se le presenteran una serie de 2 ejercicios.\n" + 
-                                "Te pedimos que leas atentamente las instrucciones\nantes de comenzar con cada uno de ellos.\n\n\n"+
-                                "Para avanzar tocá la tecla ENTER.";
-  return new String[]{greetingInstruction, exercisesInstruction};
+PImage[] generateGeneralInstructions() {
+  return new PImage[]{welcome1, welcome2};
 }
 
 Experiment currentExperiment() {
@@ -442,7 +430,7 @@ Experiment currentExperiment() {
   return experiments[currentExperimentIndex];
 }
 
-String currentGeneralInstruction() {
+PImage currentGeneralInstruction() {
   if (currentGeneralInstructionIndex < 0 || currentGeneralInstructionIndex > generalInstructions.length) {
     throw new IndexOutOfBoundsException("currentGeneralInstructionIndex is out of bounds!");
   }
@@ -451,11 +439,22 @@ String currentGeneralInstruction() {
 }
 
 void drawTerms() {
-  fill(255, 255, 255);
-  background(100);
-  textAlign(CENTER, CENTER);
-  textSize(24);
-  text(currentGeneralInstruction(), width/2, height/2);
+  background(255);
+  
+  switch(currentGeneralInstructionIndex){
+    case 0:
+      image(welcome1, width/2 - welcome1.width/2, height/2 - welcome1.height/2);
+      break;
+    case 1:
+      image(welcome2, width/2 - welcome2.width/2, height/2 - welcome2.height/2);
+      break;
+    default:
+      break;
+  }
+  
+  
+  //PImage img = currentGeneralInstruction();
+  //image(img, width/2 - img.width/2, height/2 - img.height/2);
 }
 
 void updateExperiment(boolean answeredCorrectly) {
@@ -514,12 +513,9 @@ void drawExperiment() {
   Experiment currentExperiment = currentExperiment();
   
   if (!currentExperiment.startedTrials) {
-    fill(255, 255, 255);
-    background(100);
-    textAlign(CENTER, CENTER);
-    textSize(24);
-    String instructionsTitle = "EJERCICIO " + (currentExperimentIndex + 1) + "\n\n";
-    text(instructionsTitle + currentExperiment.getInstructions(), width/2, height/2);
+    background(255);
+    PImage img = currentExperiment.getInstructions();
+    image(img, width/2 - img.width/2, height/2 - img.height/2);
     return;
   }
   
@@ -565,7 +561,7 @@ boolean showConfidenceBar = false;
 int currentExperimentIndex = 0;
 long timer = 0L;
 long millisPerBoundedExperiment = 2000; 
-String[] generalInstructions;
+PImage[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
 //int expNumber;
@@ -575,8 +571,8 @@ boolean lastRight = false;
 int correctInARow = 0;
 
 void setup() {
-  fullScreen();
-  //size(600, 600);
+  //fullScreen();
+  size(800, 600);
   
   background(100);
   frameRate(30);
@@ -630,7 +626,33 @@ void setup() {
   scale *= 0.15;
   b.resize((int)(scale*b.width), (int)(scale*b.height));
   
+  welcome1 = loadImage("data/welcome1.png");
+  scale = ((float)width)/((float)welcome1.width);
+  scale *= 0.9;
+  welcome1.resize((int)(scale*welcome1.width), (int)(scale*welcome1.height));
+  
+  welcome2 = loadImage("data/welcome2.png");
+  scale = ((float)width)/((float)welcome2.width);
+  scale *= 0.9;
+  welcome2.resize((int)(scale*welcome2.width), (int)(scale*welcome2.height));
+  
+  instructionTutorial = loadImage("data/instructionTutorial.png");
+  scale = ((float)width)/((float)instructionTutorial.width);
+  scale *= 0.9;
+  instructionTutorial.resize((int)(scale*instructionTutorial.width), (int)(scale*instructionTutorial.height));
+  
+  instructionTimeless = loadImage("data/instructionTimeless.png");
+  scale = ((float)width)/((float)instructionTimeless.width);
+  scale *= 0.9;
+  instructionTimeless.resize((int)(scale*instructionTimeless.width), (int)(scale*instructionTimeless.height));
+  
+  instructionBounded = loadImage("data/instructionBounded.png");
+  scale = ((float)width)/((float)instructionBounded.width);
+  scale *= 0.9;
+  instructionBounded.resize((int)(scale*instructionBounded.width), (int)(scale*instructionBounded.height));
+  
   frame.requestFocus();
+  
 }
 
 void drawInterScreen() {
