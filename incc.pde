@@ -111,6 +111,10 @@ class ConfidenceBar {
       }
     } else{
       move = false;
+      
+      if(mouseX > bar_x - bar_width/2 && mouseX < bar_x + bar_width/2 && mouseY > y - bar_height/2 && mouseY < y + bar_height/2){
+        circle_x = mouseX;
+      }
     }
     
     if(move){
@@ -135,7 +139,7 @@ class ConfidenceBar {
     textAlign(CENTER, CENTER);
     textSize(40);
     fill(0);
-    text("Marcá en la barra cuán seguro\nestás de tus últimas decisiones", width/2, 100);
+    text("Arrastrá con el mouse el puntero\nen la barra cuán seguro\nestás de tus últimas decisiones", width/2, 100);
     text("Apretá enter cuando estés\nconforme con tu respuesta", width/2, height - 100);
     
     textSize(25);
@@ -531,6 +535,9 @@ void drawExperiment() {
     if (millis() - timer >= millisPerBoundedExperiment) {
       updateExperiment(false);
       timer = millis();
+      interScreen = true;
+      correct = false;
+      wrong.play();
     } else {
       fill(0, 0, 200);
       noStroke();
