@@ -12,6 +12,8 @@ SoundFile wrong;
 
 int expLength = 16;
 
+ArrayList<Trial> tutorialTrials;
+
 enum Rule {
   B_35, ASHBY
 }
@@ -164,7 +166,9 @@ class Experiment {
   int points;
   final ConfidenceBar[] confidenceBars;
   int currentBar;
-
+  
+  boolean isTutorial;
+  
   Experiment(Rule rule, Complexity complexity, boolean isTimeBounded, Trial[] trials) {
     this.rule = rule;
     this.complexity = complexity;
@@ -175,8 +179,28 @@ class Experiment {
     this.points = 0;
     this.confidenceBars = generateBars();
     currentBar = 0;
+    isTutorial = false;
   }
   
+  Experiment(){
+    this.rule = null;
+    this.complexity = null;
+    this.isTimeBounded = false;
+    
+    this.trials = new Trial[tutorialTrials.size()];
+    for(int i = 0; i < tutorialTrials.size(); i++){
+      trials[i] = tutorialTrials.get(i);
+    }
+    
+    this.currentTrialIndex = 0;
+    this.startedTrials = false;
+    this.points = 0;
+    this.confidenceBars = generateBars();
+    currentBar = 0;
+    
+    this.isTutorial = true;
+  }
+
   ConfidenceBar[] generateBars(){
     ConfidenceBar[] confidenceBars = new ConfidenceBar[4];
     
@@ -267,6 +291,10 @@ class Experiment {
 
   @Override
   public String toString() {
+    if(isTutorial){
+      return "Tutorial Experiment.";
+    }
+    
     return "Experiment(rule=" + rule.toString() + 
       ", complexity=" + complexity.toString() + 
       ", isTimeBounded=" + String.valueOf(isTimeBounded) + 
@@ -294,7 +322,7 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
   int i = 0;
   for (String name : imgList) {
     //println(name);
-    if (!name.contains("png")) continue;
+    if (!name.contains("png") || name.contains("tutorial")) continue;
     name = name.substring(0, name.lastIndexOf("."));
     //println(name);
 
@@ -318,6 +346,36 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
   return allTrials;
 }
 
+
+ArrayList<Trial> generateTutorialTrials(){ //completar este método
+  String[] imgList = listFileNames(sketchPath() + "/data");
+  ArrayList<Trial> tutorialTrials = new ArrayList<Trial>();
+  int i = 0;
+  for (String name : imgList) {
+    //println(name);
+    if (!name.contains("png") || !name.contains("tutorial")) continue;
+    name = name.substring(0, name.lastIndexOf("."));
+    //println(name);
+
+    String[] parts = name.split("_");
+    //for (String part : parts) println(part);
+    String imgClass = parts[1];
+    //String imgNum = parts[3];
+    println("loading image for file " + name);
+    PImage img = loadImage(name + ".png");
+
+    tutorialTrials.add(new Trial(i,
+      img,
+      null, 
+      null, 
+      imgClass.equals("classA") ? Classification.CLASS_A : Classification.CLASS_B));
+    i++;
+  }
+  Collections.shuffle(tutorialTrials); 
+
+  return tutorialTrials;
+}
+
 Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
   Trial[] trials = new Trial[numTrials];
 
@@ -331,6 +389,10 @@ Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
   }
 
   return trials;
+}
+
+Experiment generateTutorialExperiment() {
+  return new Experiment();
 }
 
 Experiment generateRandomExperiment() {
@@ -350,10 +412,11 @@ Experiment generateComplimentaryExperiment(Experiment otherExperiment) {
 }
 
 Experiment[] generateExperimentSet() {
+  Experiment tutorial = generateTutorialExperiment();
   Experiment firstExperiment = generateRandomExperiment();
   Experiment secondExperiment = generateComplimentaryExperiment(firstExperiment);
 
-  return new Experiment[]{firstExperiment, secondExperiment};
+  return new Experiment[]{tutorial, firstExperiment, secondExperiment};
 }
 
 String[] generateGeneralInstructions() {
@@ -530,11 +593,16 @@ void setup() {
       output.println("img\trule\tcmplx\tclass\tdone\tcorrect\tt(ms)\tconf");
       //output.flush();
       println("Succesfully written head data.");
+    } else {
+      output.println("##\t##\t##\t##\t##\t##\t##\t##");
     }
   } catch(Exception e){
     println("There was an error opening the data file.");
   }
   
+  println("Generating tutorial trials");
+  tutorialTrials = generateTutorialTrials();
+  println("Generated tutorial trials");
   
   allTrials = generateAllTrials();
   experiments = generateExperimentSet();

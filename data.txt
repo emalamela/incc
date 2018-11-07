@@ -223,3 +223,97 @@ img	rule	cmplx	class	done	correct	t(ms)	conf
 380	ASHBY	SIMPLE	CLASS_B	true	true	400.0	0.5
 
 316	ASHBY	SIMPLE	CLASS_A	true	true	467.0	0.5
+##	##	##	##	##	##	##	##
+
+292	ASHBY	COMPLEX	CLASS_B	true	true	866.0	0.0
+
+279	ASHBY	COMPLEX	CLASS_B	true	false	432.0	0.0
+
+220	ASHBY	COMPLEX	CLASS_A	true	false	2167.0	0.0
+
+228	ASHBY	COMPLEX	CLASS_A	true	true	301.0	0.0
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+
+0	null	null	CLASS_A	true	false	1032.0	0.0
+
+1	null	null	CLASS_A	true	true	433.0	0.0
+
+2	null	null	CLASS_A	true	true	734.0	0.0
+
+3	null	null	CLASS_A	true	true	1401.0	0.0
+
+4	null	null	CLASS_A	true	true	1066.0	0.5
+
+5	null	null	CLASS_A	true	true	1068.0	0.5
+
+6	null	null	CLASS_B	true	true	598.0	0.5
+
+7	null	null	CLASS_B	true	true	632.0	0.5
+
+8	null	null	CLASS_B	true	true	1465.0	0.5
+
+286	ASHBY	COMPLEX	CLASS_B	true	false	1200.0	0.0
+
+225	ASHBY	COMPLEX	CLASS_A	true	false	133.0	0.0
+
+217	ASHBY	COMPLEX	CLASS_A	true	false	100.0	0.0
+
+228	ASHBY	COMPLEX	CLASS_A	true	false	532.0	0.0
+
+258	ASHBY	COMPLEX	CLASS_B	true	true	434.0	0.5
+
+267	ASHBY	COMPLEX	CLASS_B	true	true	399.0	0.5
+
+283	ASHBY	COMPLEX	CLASS_B	true	true	433.0	0.5
+
+290	ASHBY	COMPLEX	CLASS_B	true	true	466.0	0.5
+
+280	ASHBY	COMPLEX	CLASS_B	true	true	567.0	0.5
+
+294	ASHBY	COMPLEX	CLASS_B	true	true	400.0	0.5
+
+247	ASHBY	COMPLEX	CLASS_A	true	false	199.0	0.5
+
+255	ASHBY	COMPLEX	CLASS_B	true	true	333.0	0.5
+
+249	ASHBY	COMPLEX	CLASS_A	true	false	532.0	0.5
+
+231	ASHBY	COMPLEX	CLASS_A	true	false	400.0	0.5
+
+298	ASHBY	COMPLEX	CLASS_B	true	true	98.0	0.5
+
+232	ASHBY	COMPLEX	CLASS_A	true	false	401.0	0.5
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+
+3	null	null	CLASS_A	true	false	898.0	0.0
+
+8	null	null	CLASS_B	true	true	1035.0	0.0
+
+5	null	null	CLASS_A	true	true	997.0	0.0
+
+10	null	null	CLASS_B	true	true	1099.0	0.0
+
+2	null	null	CLASS_A	true	true	1565.0	0.5
+
+7	null	null	CLASS_B	true	true	899.0	0.5
+
+6	null	null	CLASS_B	true	false	1134.0	0.5
+
+4	null	null	CLASS_A	true	false	765.0	0.5
+
+1	null	null	CLASS_A	true	true	1431.0	0.5
+
+11	null	null	CLASS_B	true	true	800.0	0.5
+
+9	null	null	CLASS_B	true	false	432.0	0.5
+
+0	null	null	CLASS_A	true	false	434.0	0.5
