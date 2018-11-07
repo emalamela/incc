@@ -119,7 +119,7 @@ class ConfidenceBar {
   }
   
   void render(){
-    background(150);
+    background(255);
     
     strokeWeight(2);
     
@@ -133,14 +133,14 @@ class ConfidenceBar {
     
     //textMode(CENTER);
     textAlign(CENTER, CENTER);
-    textSize(24);
+    textSize(40);
     fill(0);
     text("Marcá en la barra cuán seguro\nestás de tus últimas decisiones", width/2, 100);
     text("Apretá enter cuando estés\nconforme con tu respuesta", width/2, height - 100);
     
-    textSize(16);
-    text("Nada\nseguro", bar_x - bar_width/2 - 40, y);
-    text("Totalmente\nseguro", bar_x + bar_width/2 + 50, y);
+    textSize(25);
+    text("Nada\nseguro", bar_x - bar_width/2 - textWidth("Nada\nseguro"), y);
+    text("Totalmente\nseguro", bar_x + bar_width/2 + textWidth("Totalmente"), y);
   }
   
   void moveCircle(float amount){
@@ -232,6 +232,7 @@ class Experiment {
     }
     
     points += correct ? 1 : 0;
+    totalTrials++;
     
     if (finishedAllTrials()) {
       throw new IllegalStateException("Already finised trials for experiment " + toString());
@@ -468,7 +469,7 @@ void updateExperiment(boolean answeredCorrectly) {
     println("There was an error while writing to the data file");
   }
   
-  if (currentExperiment.currentTrialIndex % (expLength/4) == expLength/4 - 1){
+  if (!currentExperiment.isTutorial && currentExperiment.currentTrialIndex % (expLength/4) == expLength/4 - 1){
     showConfidenceBar = true;
   }
   
@@ -540,14 +541,14 @@ void drawExperiment() {
 }
 
 void drawFinishedExperiments() {
-  background(100);
+  background(255);
   fill(0, 0, 0);
   textAlign(CENTER, CENTER);
-  textSize(24);
+  textSize(40);
   int totalPoints = 0;
   for (Experiment experiment : experiments) totalPoints += experiment.points;
   
-  text("¡Gracias por completar los experimentos!\nTu puntaje fue de " + totalPoints + "\nTocá la tecla ENTER para salir.", width/2, height/2);
+  text("¡Gracias por completar los experimentos!\nTu puntaje fue " + totalPoints + "/" + totalTrials + "\nTocá la tecla ENTER para salir.", width/2, height/2);
 }
 
 /* Logic */
@@ -566,6 +567,7 @@ Experiment[] experiments;
 ArrayList<Trial> allTrials;
 //int expNumber;
 
+int totalTrials = 0;
 
 boolean lastRight = false;
 int correctInARow = 0;
