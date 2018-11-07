@@ -317,3 +317,21 @@ img	rule	cmplx	class	done	correct	t(ms)	conf
 9	null	null	CLASS_B	true	false	432.0	0.5
 
 0	null	null	CLASS_A	true	false	434.0	0.5
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+
+0	null	null	CLASS_A	true	false	1499.0	0.0
+
+6	null	null	CLASS_B	true	false	633.0	0.0
+
+3	null	null	CLASS_A	true	true	500.0	0.0
+
+9	null	null	CLASS_B	true	true	9201.0	0.0
+
+7	null	null	CLASS_B	true	true	13959.0	0.3002451

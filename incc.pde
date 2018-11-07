@@ -8,6 +8,9 @@ PrintStream output;
 SoundFile right;
 SoundFile wrong;
 
+PImage a;
+PImage b;
+
 /* Declarations */
 
 int expLength = 16;
@@ -55,6 +58,8 @@ class Trial {
   void render() {
     background(255);
     image(img, width/2 - img.width/2, height/2 - img.height/2);
+    image(a, 20, height/2 - a.height/2);
+    image(b, width - b.width - 20, height/2 - b.height/2);
   }
   
   @Override
@@ -570,8 +575,8 @@ boolean lastRight = false;
 int correctInARow = 0;
 
 void setup() {
-  //fullScreen();
-  size(600, 600);
+  fullScreen();
+  //size(600, 600);
   
   background(100);
   frameRate(30);
@@ -613,6 +618,17 @@ void setup() {
   
   right = new SoundFile(this, "data/correct.wav");
   wrong = new SoundFile(this, "data/wrong.wav");
+  
+  a = loadImage("a.png");
+  b = loadImage("b.png");
+  
+  float scale = height/a.height;
+  scale *= 0.15;
+  a.resize((int)(scale*a.width), (int)(scale*a.height));
+  
+  scale = height/b.height;
+  scale *= 0.15;
+  b.resize((int)(scale*b.width), (int)(scale*b.height));
   
   frame.requestFocus();
 }
