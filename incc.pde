@@ -473,50 +473,45 @@ void updateExperiment(boolean answeredCorrectly) {
     println("There was an error while writing to the data file");
   }
   
-  if (!currentExperiment.isTutorial && currentExperiment.currentTrialIndex % (expLength/4) == expLength/4 - 1){
-    showConfidenceBar = true;
-  }
-  
   if(answeredCorrectly){
     correctInARow++;
   } else {
     correctInARow = 0;
   }
   
-  currentExperiment.advanceToNextTrial(answeredCorrectly);
+  if (!currentExperiment.isTutorial && 
+      ((currentExperiment.currentTrialIndex % (expLength/4) == expLength/4 - 1) || 
+      correctInARow >= maxConsecutiveCorrectAnswers)) {
+    showConfidenceBar = true;
+  }
   
-  checkIfFinished();
-
+  currentExperiment.advanceToNextTrial(answeredCorrectly);
 }
 
 void checkIfFinished(){
   
-  if ((currentExperiment().finishedAllTrials() || correctInARow >= 8) && !showConfidenceBar) {
+  if (currentExperiment().finishedAllTrials() || correctInARow >= maxConsecutiveCorrectAnswers) {
     println("changing experiment index");
     currentExperimentIndex++;
-    correctInARow = 0;
-    if(correctInARow >= 8){
-      showConfidenceBar = true;
-    }
     println("Moving to Experiment number " + String.valueOf(currentExperimentIndex));
+    correctInARow = 0;
+  }
 
-    if (currentExperimentIndex >= experiments.length) {
-      println("Finishing experiments");
-      hasFinishedExperiments = true;
-      try{
-        //output.flush();
-        //println("Succesfully closed data file.");
-      }catch(Exception e){
-        println("There was an error closing the data file.");
-      }
+  if (currentExperimentIndex >= experiments.length) {
+    println("Finishing experiments");
+    hasFinishedExperiments = true;
+    try{
+      //output.flush();
+      //println("Succesfully closed data file.");
+    }catch(Exception e){
+      println("There was an error closing the data file.");
     }
-    
-    
   }
 }
 
 void drawExperiment() {
-  if (hasFinishedExperiments) return; 
+  checkIfFinished();
+  if (hasFinishedExperiments) return;
 
   Experiment currentExperiment = currentExperiment();
   
@@ -544,7 +539,7 @@ void drawExperiment() {
     } else {
       fill(0, 0, 200);
       noStroke();
-      float w = map(millis() - timer, 0, 2000, width, 0);
+      float w = map(millis() - timer, 0, millisPerBoundedExperiment, width, 0);
       rect(0, 0, w, 25);
     }
   }
@@ -571,7 +566,8 @@ int currentGeneralInstructionIndex = 0;
 boolean showConfidenceBar = false;
 int currentExperimentIndex = 0;
 long timer = 0L;
-long millisPerBoundedExperiment = 2000; 
+long millisPerBoundedExperiment = 1000; 
+int maxConsecutiveCorrectAnswers = 4;
 PImage[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
@@ -677,7 +673,7 @@ void drawInterScreen() {
     text("¡CORRECTO! +1", width/2, height/2);
   } else {
     background(200, 0, 0);
-    text("INCORRECTO :(", width/2, height/2);
+    text("INCORRECTO :/", width/2, height/2);
   }
 
   if (timer == 0L) {
@@ -696,11 +692,11 @@ void draw() {
     drawTerms();
   } else if (interScreen) {
     drawInterScreen();
-  } else if (hasFinishedExperiments) {
-    drawFinishedExperiments();
   } else if (showConfidenceBar) {
     currentExperiment().getCurrentBar().update();
     currentExperiment().getCurrentBar().render();
+  } else if (hasFinishedExperiments) {
+    drawFinishedExperiments();
   } else {
     drawExperiment();
   }
@@ -744,20 +740,19 @@ void handleGeneralInstructionKeyReleased() {
 void handleExperimentKeyReleased() {
   Experiment currentExperiment = currentExperiment();
   
-  if (!currentExperiment.startedTrials) {
-    if (keyCode == ENTER) {
-      currentExperiment.startTrials();
-    }
-    return;
-  }
-
   if (showConfidenceBar) {
     if (keyCode == ENTER) {
       currentExperiment.getCurrentBar().setConfidence();
       currentExperiment.currentBar++;
       showConfidenceBar = false;
-      checkIfFinished();
       timer = millis();
+    }
+    return;
+  }
+  
+  if (!currentExperiment.startedTrials) {
+    if (keyCode == ENTER) {
+      currentExperiment.startTrials();
     }
     return;
   }
@@ -773,14 +768,14 @@ void handleExperimentKeyReleased() {
     //println(correct ? "correct!" : "wrong!");
     
     if(correct){
-      right.play();
+      right.play(1.0f, 0.5);
     } else {
       wrong.play();
     }
     
+    updateExperiment(correct);
     interScreen = true;
     timer = millis();
-    updateExperiment(correct);
     return;
   }
 }
