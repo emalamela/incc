@@ -112,9 +112,9 @@ class ConfidenceBar {
     } else{
       move = false;
       
-      if(mouseX > bar_x - bar_width/2 && mouseX < bar_x + bar_width/2 && mouseY > y - bar_height/2 && mouseY < y + bar_height/2){
-        circle_x = mouseX;
-      }
+      //if(mouseX > bar_x - bar_width/2 && mouseX < bar_x + bar_width/2 && mouseY > y - bar_height/2 && mouseY < y + bar_height/2){
+      //  circle_x = mouseX;
+      //}
     }
     
     if(move){
@@ -495,6 +495,9 @@ void checkIfFinished(){
     println("changing experiment index");
     currentExperimentIndex++;
     correctInARow = 0;
+    if(correctInARow >= 8){
+      showConfidenceBar = true;
+    }
     println("Moving to Experiment number " + String.valueOf(currentExperimentIndex));
 
     if (currentExperimentIndex >= experiments.length) {
