@@ -1,6 +1,6 @@
 float rel_tr_height = sqrt(3)/2;
 int counter;
-int problem = 0;
+int problem = 1;
 String classif = "NOTVALID";
 
 void setup() {
@@ -43,15 +43,15 @@ String makeTutorial(boolean circle){
 String makeProblemOne(boolean complex, boolean parallel, boolean high){
   String result = "problem1";
   
-  boolean isRect = random(1) > 0.5;
+  boolean isRect = false;
   
   float angle = random(2*PI);
   
-  float w = random(70, 150);
-  float h = random(200, 350);
+  float w = 130;
+  float h = 300;
   
-  float x = random(h, width - h);
-  float y = random(h, height - h);
+  float x = width/2;
+  float y = height/2;
   
   println(angle);
   
@@ -73,7 +73,7 @@ String makeProblemOne(boolean complex, boolean parallel, boolean high){
   
   //dibujo la figura interna
   
-  isRect = random(1) > 0.5;
+  isRect = false;
   
   float fillColor = random(50, 250);
   float angleChange = 0;
@@ -87,10 +87,12 @@ String makeProblemOne(boolean complex, boolean parallel, boolean high){
     if(high){
       result = result + "_classB";
       oo+=PI/4;
+      println("B");
     } else {
       result = result + "_classA";
-    }
-    angleChange = oo + map(fillColor, 50, 250, 0, PI/4);
+      println("A");
+      }
+    angleChange = oo + map(fillColor, 50, 250, 0, PI/6);
   } else {
     result = result + "_simple";
     if(!parallel){
@@ -112,7 +114,7 @@ String makeProblemOne(boolean complex, boolean parallel, boolean high){
     rotate(angle + angleChange);
   }
   
-  float scaling = (w/h) * random(0.3, 0.7);
+  float scaling = (w/h) * 0.5; //random(0.3, 0.7);
   w *= scaling;
   h *= scaling;
   
@@ -126,6 +128,7 @@ String makeProblemOne(boolean complex, boolean parallel, boolean high){
   return result;
 }
 
+// genero imágenes para ashby
 String makeProblemTwo(boolean complex, boolean high, boolean highDensity){
   String result = "problem2";
   
@@ -137,17 +140,18 @@ String makeProblemTwo(boolean complex, boolean high, boolean highDensity){
   
   float oo = 0; // hay que variarlo
   
-  float density = 0.02;
+  float density = 0;
   
   if(complex){
     result = result + "_complex";
     println("COMPLEX");
     if(high){
       result = result + "_classB";
-      oo+=0.005;
+      oo = 0.02;
       println("B");
     } else {
       result = result + "_classA";
+      oo = 0.01;
       println("A");
     }
     density = oo + map(w, 200, 500, 0, 0.02);
@@ -155,10 +159,10 @@ String makeProblemTwo(boolean complex, boolean high, boolean highDensity){
     result = result + "_simple";
     if(highDensity){
       result = result + "_classB";
-      density = 0.01;
+      density = 0.015;
     } else {
       result = result + "_classA";
-      density = 0.02;
+      density = 0.03;
     }
   }
   
@@ -186,7 +190,7 @@ String makeProblemTwo(boolean complex, boolean high, boolean highDensity){
 
 
 void mouseClicked(){
-  save(classif + "_" + counter + ".png");
+  //save(classif + "_" + counter + ".png");
   counter++;
   
   generate();
@@ -202,8 +206,9 @@ void keyPressed(){
 }
 
 void generate(){
+  println("console");
   if(problem == 1){
-    classif = makeProblemOne(false,random(1)>0.5,random(1)>0.5);
+    classif = makeProblemOne(true,random(1)>0.5,random(1)>0.5);
   } else if (problem == 2){
     classif = makeProblemTwo(false, random(1)>0.5, random(1)>0.5);
   } else if (problem == 0){

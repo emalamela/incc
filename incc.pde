@@ -57,7 +57,10 @@ class Trial {
     
     
     float scale = height/img.height;
-    scale *= 0.8;
+    scale *= 1.1;
+    
+    if(rule == null) scale *= 0.8;
+    
     img.resize((int)(scale*img.width), (int)(scale*img.height));
   }
   

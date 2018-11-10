@@ -622,3 +622,159 @@ img	rule	cmplx	class	done	correct	t(ms)	conf
 9	null	null	CLASS_A	true	false	402.0	0.0
 
 4	null	null	CLASS_A	true	true	134.0	0.0
+##	##	##	##	##	##	##	##
+
+4	null	null	CLASS_A	true	false	1105.0	0.0
+
+7	null	null	CLASS_B	true	false	566.0	0.0
+
+5	null	null	CLASS_A	true	true	600.0	0.0
+
+2	null	null	CLASS_A	true	false	699.0	0.0
+
+6	null	null	CLASS_B	true	true	3335.0	0.0
+
+11	null	null	CLASS_B	true	true	571.0	0.0
+
+0	null	null	CLASS_A	true	true	666.0	0.0
+
+1	null	null	CLASS_A	true	true	600.0	0.0
+
+103	B_35	SIMPLE	CLASS_A	true	false	666.0	0.0
+
+189	B_35	SIMPLE	CLASS_B	true	false	466.0	0.0
+
+140	B_35	SIMPLE	CLASS_A	true	true	600.0	0.0
+
+149	B_35	SIMPLE	CLASS_B	true	true	1067.0	0.0
+
+107	B_35	SIMPLE	CLASS_A	true	true	865.0	0.0
+
+176	B_35	SIMPLE	CLASS_B	true	true	800.0	0.0
+
+205	ASHBY	COMPLEX	CLASS_A	true	false	702.0	0.0
+
+259	ASHBY	COMPLEX	CLASS_B	true	false	466.0	0.0
+
+237	ASHBY	COMPLEX	CLASS_A	true	false	469.0	0.0
+
+200	ASHBY	COMPLEX	CLASS_A	true	false	431.0	0.0
+
+290	ASHBY	COMPLEX	CLASS_B	true	true	66.0	0.0
+
+242	ASHBY	COMPLEX	CLASS_A	true	true	733.0	0.0
+
+289	ASHBY	COMPLEX	CLASS_B	true	false	766.0	0.0
+##	##	##	##	##	##	##	##
+
+0	null	null	CLASS_A	true	false	1561.0	0.0
+
+6	null	null	CLASS_B	true	false	1400.0	0.0
+
+11	null	null	CLASS_B	true	true	1232.0	0.0
+
+8	null	null	CLASS_B	true	false	563.0	0.0
+
+10	null	null	CLASS_B	true	true	598.0	0.0
+
+2	null	null	CLASS_A	true	false	599.0	0.0
+
+7	null	null	CLASS_B	true	false	531.0	0.0
+
+1	null	null	CLASS_A	true	false	698.0	0.0
+
+9	null	null	CLASS_B	true	false	499.0	0.0
+
+5	null	null	CLASS_A	true	false	697.0	0.0
+
+3	null	null	CLASS_A	true	true	733.0	0.0
+
+4	null	null	CLASS_A	true	true	796.0	0.0
+
+105	B_35	SIMPLE	CLASS_A	true	true	1235.0	0.0
+
+123	B_35	SIMPLE	CLASS_A	true	false	598.0	0.0
+
+116	B_35	SIMPLE	CLASS_A	true	false	0.0	0.0
+
+141	B_35	SIMPLE	CLASS_A	true	false	499.0	0.0
+
+155	B_35	SIMPLE	CLASS_B	true	false	796.0	0.0
+
+171	B_35	SIMPLE	CLASS_B	true	true	968.0	0.0
+
+157	B_35	SIMPLE	CLASS_B	true	false	567.0	0.0
+
+192	B_35	SIMPLE	CLASS_B	true	false	1399.0	0.0
+
+173	B_35	SIMPLE	CLASS_B	true	true	799.0	0.0
+
+112	B_35	SIMPLE	CLASS_A	true	true	932.0	0.0
+
+159	B_35	SIMPLE	CLASS_B	true	true	1166.0	0.0
+
+150	B_35	SIMPLE	CLASS_B	true	true	730.0	0.0
+
+259	ASHBY	COMPLEX	CLASS_B	true	true	933.0	0.0
+
+295	ASHBY	COMPLEX	CLASS_B	true	false	700.0	0.0
+
+256	ASHBY	COMPLEX	CLASS_B	true	true	633.0	0.0
+
+285	ASHBY	COMPLEX	CLASS_B	true	true	900.0	0.0
+
+286	ASHBY	COMPLEX	CLASS_B	true	true	696.0	0.0
+
+220	ASHBY	COMPLEX	CLASS_A	true	true	569.0	0.0
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
+
+8	null	null	CLASS_B	true	true	836.0	0.0
+
+3	null	null	CLASS_A	true	true	533.0	0.0
+
+0	null	null	CLASS_A	true	true	776.0	0.0
+
+2	null	null	CLASS_A	true	true	599.0	0.0
+
+109	B_35	SIMPLE	CLASS_A	true	true	868.0	0.0
+
+173	B_35	SIMPLE	CLASS_B	true	true	832.0	0.0
+
+100	B_35	SIMPLE	CLASS_A	false	false	0.0	0.0
+
+170	B_35	SIMPLE	CLASS_B	true	false	931.0	0.0
+
+105	B_35	SIMPLE	CLASS_A	true	false	730.0	0.0
+
+124	B_35	SIMPLE	CLASS_A	true	true	798.0	0.0
+
+164	B_35	SIMPLE	CLASS_B	true	true	598.0	0.0
+
+143	B_35	SIMPLE	CLASS_A	true	true	598.0	0.0
+
+177	B_35	SIMPLE	CLASS_B	true	true	799.0	0.0
+
+207	ASHBY	COMPLEX	CLASS_A	true	false	1936.0	0.0
+
+218	ASHBY	COMPLEX	CLASS_A	true	true	1035.0	0.0
+
+294	ASHBY	COMPLEX	CLASS_B	true	true	700.0	0.0
+
+261	ASHBY	COMPLEX	CLASS_B	true	true	795.0	0.0
+
+200	ASHBY	COMPLEX	CLASS_A	true	false	904.0	0.0
+
+236	ASHBY	COMPLEX	CLASS_A	true	true	973.0	0.0
+
+231	ASHBY	COMPLEX	CLASS_A	true	false	1004.0	0.0
+
+211	ASHBY	COMPLEX	CLASS_A	true	true	2566.0	0.0
+
+274	ASHBY	COMPLEX	CLASS_B	true	true	1398.0	0.0
+
+264	ASHBY	COMPLEX	CLASS_B	true	true	1366.0	0.0
+
+254	ASHBY	COMPLEX	CLASS_B	true	true	1730.0	0.0
+##	##	##	##	##	##	##	##
+##	##	##	##	##	##	##	##
