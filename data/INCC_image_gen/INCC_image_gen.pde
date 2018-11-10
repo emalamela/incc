@@ -83,6 +83,7 @@ String makeProblemOne(boolean complex, boolean parallel, boolean high){
   fill(fillColor);
   
   if(complex){
+    parallel = false;
     result = result + "_complex";
     if(high){
       result = result + "_classB";
@@ -190,7 +191,7 @@ String makeProblemTwo(boolean complex, boolean high, boolean highDensity){
 
 
 void mouseClicked(){
-  //save(classif + "_" + counter + ".png");
+  save(classif + "_" + counter + ".png");
   counter++;
   
   generate();
@@ -208,7 +209,7 @@ void keyPressed(){
 void generate(){
   println("console");
   if(problem == 1){
-    classif = makeProblemOne(true,random(1)>0.5,random(1)>0.5);
+    classif = makeProblemOne(false,random(1)>0.5,random(1)>0.5);
   } else if (problem == 2){
     classif = makeProblemTwo(false, random(1)>0.5, random(1)>0.5);
   } else if (problem == 0){
