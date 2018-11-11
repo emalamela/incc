@@ -87,13 +87,13 @@ String makeProblemOne(boolean complex, boolean parallel, boolean high){
     result = result + "_complex";
     if(high){
       result = result + "_classB";
-      oo+=PI/4;
+      oo+=PI/2;
       println("B");
     } else {
       result = result + "_classA";
       println("A");
       }
-    angleChange = oo + map(fillColor, 50, 250, 0, PI/6);
+    angleChange = oo + map(fillColor, 50, 250, 0, PI/2);
   } else {
     result = result + "_simple";
     if(!parallel){
@@ -209,7 +209,7 @@ void keyPressed(){
 void generate(){
   println("console");
   if(problem == 1){
-    classif = makeProblemOne(false,random(1)>0.5,random(1)>0.5);
+    classif = makeProblemOne(true,random(1)>0.5,random(1)>0.5);
   } else if (problem == 2){
     classif = makeProblemTwo(false, random(1)>0.5, random(1)>0.5);
   } else if (problem == 0){
