@@ -527,6 +527,8 @@ void drawExperiment() {
   
   currentExperiment.getCurrentTrial().render();
 
+  drawPoints();
+
   if (currentExperiment.isTimeBounded) {
     if (timer == 0L) {
       // Haven't initialized timer 
@@ -548,15 +550,25 @@ void drawExperiment() {
   }
 }
 
+void drawPoints() {
+  fill(0, 0, 0);
+  textSize(40);
+  text("Puntos: " + calculatePoints(), width - 150, height - 50);
+}
+
 void drawFinishedExperiments() {
   background(255);
   fill(0, 0, 0);
   textAlign(CENTER, CENTER);
   textSize(40);
-  int totalPoints = 0;
-  for (Experiment experiment : experiments) totalPoints += experiment.points;
   
-  text("¡Gracias por completar los experimentos!\nTu puntaje fue " + totalPoints + "/" + totalTrials + "\nTocá la tecla ENTER para salir.", width/2, height/2);
+  text("¡Gracias por completar los experimentos!\nTu puntaje fue " + calculatePoints() + "/" + totalTrials + "\nTocá la tecla ENTER para salir.", width/2, height/2);
+}
+
+int calculatePoints() {
+  int points = 0;
+  for (Experiment experiment : experiments) points += experiment.points;
+  return points;
 }
 
 /* Logic */
