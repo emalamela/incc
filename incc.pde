@@ -607,8 +607,8 @@ void loadData() {
   println("Starting to load files.");
   
   try{
-    output = new PrintStream(new FileOutputStream(new File(sketchPath() + "/data.txt"), true));
-    String[] lines2 = loadStrings("data.txt");
+    output = new PrintStream(new FileOutputStream(new File(sketchPath() + "/data/data.txt"), true));
+    String[] lines2 = loadStrings("data/data.txt");
     println("Succesfully loaded data file.");
     if(lines2.length==0){
       output.println("img\trule\tcmplx\tclass\tdone\tcorrect\tt(ms)\tconf");
@@ -636,8 +636,8 @@ void loadData() {
   right = new SoundFile(this, "data/correct.wav");
   wrong = new SoundFile(this, "data/wrong.wav");
   
-  a = loadImage("a.png");
-  b = loadImage("b.png");
+  a = loadImage("data/a.png");
+  b = loadImage("data/b.png");
   
   float scale = height/a.height;
   scale *= 0.15;
