@@ -55,7 +55,6 @@ class Trial {
     this.correct = false;
     this.time = 0f;
     
-    
     float scale = height/img.height;
     scale *= 1.1;
     
@@ -582,11 +581,12 @@ boolean showConfidenceBar = false;
 int currentExperimentIndex = 0;
 long timer = 0L;
 long millisPerBoundedExperiment = 1000; 
-int maxConsecutiveCorrectAnswers = 4;
+int maxConsecutiveCorrectAnswers = 8;
 PImage[] generalInstructions;
 Experiment[] experiments;
 ArrayList<Trial> allTrials;
-//int expNumber;
+boolean shownLoading = false;
+boolean finishedLoadingData = false;
 
 int totalTrials = 0;
 
@@ -600,14 +600,11 @@ void setup() {
   background(100);
   frameRate(30);
   
+  frame.requestFocus();
+}
+
+void loadData() {
   println("Starting to load files.");
-  
-  /*String[] lines = loadStrings("numExp.txt");
-  expNumber = Integer.parseInt(lines[0]);
-  numOutput = createWriter("numExp.txt");
-  numOutput.println((expNumber+1)+"");
-  numOutput.flush();
-  numOutput.close();*/
   
   try{
     output = new PrintStream(new FileOutputStream(new File(sketchPath() + "/data.txt"), true));
@@ -634,6 +631,7 @@ void setup() {
 
   println("Experiment #1 is " + experiments[0].toString());
   println("Experiment #2 is " + experiments[1].toString());
+  println("Experiment #3 is " + experiments[2].toString());
   
   right = new SoundFile(this, "data/correct.wav");
   wrong = new SoundFile(this, "data/wrong.wav");
@@ -674,8 +672,8 @@ void setup() {
   scale *= 0.9;
   instructionBounded.resize((int)(scale*instructionBounded.width), (int)(scale*instructionBounded.height));
   
-  frame.requestFocus();
-  
+  println("Finished loading data!");
+  finishedLoadingData = true;
 }
 
 void drawInterScreen() {
@@ -702,8 +700,19 @@ void drawInterScreen() {
   }
 }
 
+void drawLoading() {
+  textAlign(CENTER);
+  textSize(40);
+  text("Cargando...", width/2, height/2);
+  shownLoading = true;
+}
+
 void draw() {
-  if (!hasUserAcceptedTerms) {
+  if (!shownLoading) {
+    drawLoading();
+  } else if (!finishedLoadingData) {
+    loadData();
+  } else if (!hasUserAcceptedTerms) {
     drawTerms();
   } else if (interScreen) {
     drawInterScreen();
