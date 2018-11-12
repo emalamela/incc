@@ -767,6 +767,7 @@ void handleExperimentKeyReleased() {
   if (showConfidenceBar) {
     if (keyCode == ENTER) {
       currentExperiment.getCurrentBar().setConfidence();
+      output.println("##\t##\t##\t##\t##\t##\t##\t" + currentExperiment.getCurrentBar().getConfidence());
       currentExperiment.currentBar++;
       showConfidenceBar = false;
       timer = millis();
