@@ -323,7 +323,7 @@ String[] listFileNames(String dir) {
 }
 
 ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el formato "problem1_simple_1_classA.png"
-  String[] imgList = listFileNames(sketchPath() + "/data");
+  String[] imgList = listFileNames(dataPath(""));
   ArrayList<Trial> allTrials = new ArrayList<Trial>();
   int i = 0;
   for (String name : imgList) {
@@ -353,8 +353,8 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
 }
 
 
-ArrayList<Trial> generateTutorialTrials(){ //completar este método
-  String[] imgList = listFileNames(sketchPath() + "/data");
+ArrayList<Trial> generateTutorialTrials(){
+  String[] imgList = listFileNames(dataPath(""));
   ArrayList<Trial> tutorialTrials = new ArrayList<Trial>();
   int i = 0;
   for (String name : imgList) {
@@ -603,12 +603,19 @@ void setup() {
   frame.requestFocus();
 }
 
+private String resultsFilePath() {
+  return sketchPath() + "/resultados.txt";
+}
+
 void loadData() {
   println("Starting to load files.");
-  
+  println("Sketch Path: " + sketchPath());
+  println("Data Path: " + dataPath(""));
   try{
-    output = new PrintStream(new FileOutputStream(new File(sketchPath() + "/data/data.txt"), true));
-    String[] lines2 = loadStrings("data/data.txt");
+    File resultsFile = new File(resultsFilePath());
+    resultsFile.createNewFile();
+    output = new PrintStream(new FileOutputStream(resultsFile, true));
+    String[] lines2 = loadStrings(resultsFilePath());
     println("Succesfully loaded data file.");
     if(lines2.length==0){
       output.println("img\trule\tcmplx\tclass\tdone\tcorrect\tt(ms)\tconf");
