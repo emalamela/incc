@@ -70,6 +70,10 @@ class Trial {
     image(b, width - b.width - 20, height/2 - b.height/2);
   }
   
+  void freeSpace(){
+    img = null;
+  }
+  
   @Override
   public String toString(){
     return id + "\t" + rule + "\t" + complexity + "\t" + classification + "\t" + classified + "\t" + correct + "\t" + time;
@@ -240,9 +244,8 @@ class Experiment {
     points += correct ? 1 : 0;
     totalTrials++;
     
-    if (finishedAllTrials()) {
-      throw new IllegalStateException("Already finised trials for experiment " + toString());
-    }
+    currentExperiment().getCurrentTrial().freeSpace();
+    
     println("Trial " + currentExperiment().currentTrialIndex + " % " + expLength/4 +" = " + currentExperiment().currentTrialIndex % (expLength/4));
     currentTrialIndex++;
   }
