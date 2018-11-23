@@ -325,15 +325,14 @@ String[] listFileNames(String dir) {
   }
 }
 
-ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el formato "problem1_simple_1_classA.png"
+Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials, int startNumber) { // el nombre del archivo debe tener el formato "problem1_simple_1_classA.png"
   String[] imgList = listFileNames(dataPath(""));
-  ArrayList<Trial> allTrials = new ArrayList<Trial>();
+  ArrayList<Trial> trials = new ArrayList<Trial>();
   int i = 0;
   for (String name : imgList) {
-    //println(name);
+    if (i >= numTrials) break;
     if (!name.contains("png") || !(name.contains("problem1") || name.contains("problem2"))) continue;
     name = name.substring(0, name.lastIndexOf("."));
-    //println(name);
 
     String[] parts = name.split("_");
     //for (String part : parts) println(part);
@@ -342,17 +341,20 @@ ArrayList<Trial> generateAllTrials() { // el nombre del archivo debe tener el fo
     String imgClass = parts[2];
     //String imgNum = parts[3];
     PImage img = loadImage(name + ".png");
-
-    allTrials.add(new Trial(i,
+    
+    Trial trial = new Trial(i + startNumber,
       img,
       imgRule.equals("problem1") ? Rule.B_35 : Rule.ASHBY, 
       imgComplexity.equals("simple") ? Complexity.SIMPLE : Complexity.COMPLEX, 
-      imgClass.equals("classA") ? Classification.CLASS_A : Classification.CLASS_B)
-    );
-    i++;
+      imgClass.equals("classA") ? Classification.CLASS_A : Classification.CLASS_B);
+      
+      if (rule == trial.rule && complexity == trial.complexity) {
+        trials.add(trial);
+        i++;
+      }
   }
-  Collections.shuffle(allTrials);
-  return allTrials;
+  Collections.shuffle(trials);
+  return trials.toArray(new Trial[trials.size()]);
 }
 
 
@@ -385,21 +387,6 @@ ArrayList<Trial> generateTutorialTrials(){
   return tutorialTrials;
 }
 
-Trial[] generateTrials(Rule rule, Complexity complexity, int numTrials) {
-  Trial[] trials = new Trial[numTrials];
-
-  int i = 0; //<>// //<>//
-  for (Trial trial : allTrials) {
-    if (i >= numTrials) break;
-    if (trial.complexity == complexity && trial.rule == rule) {
-      trials[i] = trial;
-      i++;
-    }
-  }
-
-  return trials;
-}
-
 Experiment generateTutorialExperiment() {
   return new Experiment();
 }
@@ -409,7 +396,7 @@ Experiment generateRandomExperiment() {
   Complexity randomComplexity = Complexity.values()[int(random(Complexity.values().length))];
   boolean isTimeBounded = random(1) > 0.5f;
 
-  return new Experiment(randomRule, randomComplexity, isTimeBounded, generateTrials(randomRule, randomComplexity, expLength));
+  return new Experiment(randomRule, randomComplexity, isTimeBounded, generateTrials(randomRule, randomComplexity, expLength, 0));
 }
 
 Experiment generateComplimentaryExperiment(Experiment otherExperiment) {
@@ -417,7 +404,7 @@ Experiment generateComplimentaryExperiment(Experiment otherExperiment) {
   Complexity complimentaryComplexity = otherExperiment.complexity == Complexity.SIMPLE ? Complexity.COMPLEX : Complexity.SIMPLE;
   boolean isTimeBounded = !otherExperiment.isTimeBounded;
 
-  return new Experiment(complimentaryRule, complimentaryComplexity, isTimeBounded, generateTrials(complimentaryRule, complimentaryComplexity, expLength));
+  return new Experiment(complimentaryRule, complimentaryComplexity, isTimeBounded, generateTrials(complimentaryRule, complimentaryComplexity, expLength, expLength));
 }
 
 Experiment[] generateExperimentSet() {
@@ -587,7 +574,6 @@ long millisPerBoundedExperiment = 1000;
 int maxConsecutiveCorrectAnswers = 8;
 PImage[] generalInstructions;
 Experiment[] experiments;
-ArrayList<Trial> allTrials;
 boolean shownLoading = false;
 boolean finishedLoadingData = false;
 
@@ -635,7 +621,6 @@ void loadData() {
   tutorialTrials = generateTutorialTrials();
   println("Generated tutorial trials");
   
-  allTrials = generateAllTrials();
   experiments = generateExperimentSet();
   generalInstructions = generateGeneralInstructions();
 
